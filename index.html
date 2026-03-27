@@ -1,0 +1,3208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROPHECY — Command</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Neutrals — tight gray scale, no warmth */
+  --ink:#0F0F0F;--ink2:#1A1A1A;--ink3:#222222;
+  /* Brand accent — single, minimal */
+  --accent:#0057FF;--accent2:#003ECC;
+  /* Status — semantic only */
+  --red:#D92D20;--redt:rgba(217,45,32,.08);
+  --amber:#D97706;--ambrt:rgba(217,119,6,.08);
+  --green:#079455;--grnt:rgba(7,148,85,.08);
+  --blue:#0057FF;--bluet:rgba(0,87,255,.08);
+  /* Surfaces */
+  --bg:#F9F9F9;--card:#FFFFFF;--card2:#F4F4F4;
+  --line:#E4E4E4;--lineb:#CFCFCF;
+  /* Text */
+  --text:#0F0F0F;--muted:#525252;--ghost:#9E9E9E;
+  /* Aliases for backwards compat */
+  --plum:#0057FF;--gold:#D97706;--gold2:#F59E0B;
+  --rose:#D92D20;--sage:#079455;--slate:#0057FF;
+  --amber:#D97706;
+  --paper:#F9F9F9;--lineb:#CFCFCF;
+  --r:6px;--sidebar-w:200px;
+}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--lineb);border-radius:2px}
+
+/* ─── SIDEBAR ─── */
+#sb{width:var(--sidebar-w);flex-shrink:0;background:#0F0F0F;border-right:1px solid rgba(255,255,255,.06);min-height:100vh;position:sticky;top:0;display:flex;flex-direction:column;z-index:100}
+.sb-brand{padding:16px 14px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-name{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:#fff;letter-spacing:.14em;text-transform:uppercase}
+.sb-tag{font-size:10px;color:rgba(255,255,255,.32);letter-spacing:.01em;margin-top:3px;text-transform:none;font-weight:400}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-sec{font-size:9px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.08em;text-transform:uppercase;padding:16px 10px 4px}
+.snav{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:4px;width:100%;border:none;background:transparent;color:rgba(255,255,255,.45);font-size:12px;font-weight:400;cursor:pointer;transition:all .1s;font-family:'Inter',sans-serif;text-align:left}
+.snav .si{font-size:13px;opacity:.65;flex-shrink:0;width:15px;text-align:center}
+.snav:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8)}
+.snav.active{background:rgba(255,255,255,.08);color:#fff;font-weight:500}
+.snav.active .si{opacity:1}
+.sn-badge{margin-left:auto;font-size:10px;font-weight:500;padding:1px 6px;border-radius:10px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);min-width:18px;text-align:center}
+.snav.active .sn-badge{background:rgba(255,255,255,.15);color:#fff}
+.snav.alert-nav .sn-badge{background:rgba(176,64,96,.2);color:#e8809a}
+.sb-bottom{padding:10px 8px 14px;border-top:1px solid rgba(255,255,255,.05)}
+.sb-sync-row{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:5px;border:1px solid;cursor:pointer;font-size:10px;font-weight:600;font-family:'Inter',sans-serif;transition:all .12s;width:100%;background:transparent}
+.sb-sync-row.live{border-color:rgba(7,148,85,.25);color:#4ade80}
+.sb-sync-row.syncing{border-color:rgba(217,119,6,.2);color:#D97706;animation:flik .9s infinite alternate}
+.sb-sync-row.offline{border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.3)}
+@keyframes flik{from{opacity:.5}to{opacity:1}}
+.sdot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* ─── MAIN ─── */
+#main{flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
+
+/* ─── TOPBAR ─── */
+#topbar{background:#fff;border-bottom:1px solid #E4E4E4;height:44px;padding:0 20px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:90;flex-shrink:0}
+#tb-title{font-size:13px;font-weight:600;color:#0F0F0F;flex:1;letter-spacing:-.01em}
+.fp-row{display:flex;gap:4px}
+.fp{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;border:1px solid #E4E4E4;font-size:11px;font-weight:500;cursor:pointer;transition:all .1s;background:transparent;font-family:'Inter',sans-serif;color:#525252}
+.fp.active-pill{background:#0F0F0F;color:#fff;border-color:#0F0F0F}
+.pdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+#countdown-chip{display:flex;align-items:center;gap:6px;background:#F4F4F4;border:1px solid #E4E4E4;border-radius:4px;padding:4px 10px}
+.cd-blink{width:4px;height:4px;border-radius:50%;background:#D97706;animation:bk 2s infinite}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.2}}
+#cdtxt{font-family:'JetBrains Mono',monospace;font-size:11px;color:#D97706;font-weight:600}
+.cd-sub{font-size:10px;color:#9E9E9E}
+#add-btn{padding:5px 13px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s;letter-spacing:0}
+#add-btn:hover{background:#1A1A1A}
+
+/* ─── PAGES ─── */
+.page{display:none}.page.active{display:block}
+
+/* ═══════════════════ OVERVIEW ═══════════════════ */
+#pg-overview{background:#F9F9F9}
+
+/* SITUATION BAR */
+.sit-bar{background:#fff;padding:0;border-bottom:1px solid #E4E4E4}
+.sit-row1{display:flex;align-items:flex-start;gap:0;padding:14px 20px 12px}
+.sit-txt{flex:1;padding-right:12px}
+.sit-eye{font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.sit-headline{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#0F0F0F;margin-bottom:2px}
+.sit-brief{font-size:12px;color:#525252;line-height:1.6;max-width:600px}
+#insight-txt{color:#525252;font-style:normal}
+.sit-refresh{background:none;border:1px solid #E4E4E4;border-radius:4px;color:#9E9E9E;cursor:pointer;padding:3px 8px;font-size:12px;margin-left:8px;transition:all .1s}
+.sit-refresh:hover{border-color:rgba(184,150,90,.3);color:var(--gold)}
+.sit-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#E4E4E4;border-top:1px solid #E4E4E4;overflow:hidden}
+.kpi-c{padding:12px 18px;background:#fff}
+.kpi-lbl{font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.02em;text-transform:uppercase;margin-bottom:4px}
+.kpi-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;line-height:1;margin-bottom:3px;letter-spacing:-.02em}
+.kpi-v.vg{color:#D97706}.kpi-v.vr{color:#D92D20}.kpi-v.vs{color:#079455}.kpi-v.va{color:#D97706}
+.kpi-n{font-size:11px;color:#9E9E9E;line-height:1.4}
+
+/* TRACKS */
+.tracks-outer{padding:16px 20px 0}
+.section-eyebrow{font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--line)}
+.tracks-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.track{background:#fff;border-radius:6px;border:1px solid #E4E4E4;overflow:hidden;display:flex;flex-direction:column}
+.track-bar{height:2px}
+.track-head{padding:11px 13px 8px;display:flex;align-items:flex-start;justify-content:space-between}
+.track-nm{font-size:11px;font-weight:600;color:#0F0F0F;letter-spacing:-.01em}
+.track-owner-txt{font-size:10px;color:#9E9E9E;margin-top:1px}
+.t-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;letter-spacing:.01em;text-transform:none;flex-shrink:0;margin-top:0}
+.tb-on{background:#ECFDF3;color:#079455}.tb-risk{background:#FFFAEB;color:#D97706}.tb-critical{background:#FEF3F2;color:#D92D20}.tb-pending{background:#EFF8FF;color:#0057FF}
+.track-body{padding:2px 13px 10px;border-bottom:1px solid #E4E4E4}
+.track-num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;line-height:1;color:#0F0F0F;letter-spacing:-.02em}
+.track-numsub{font-size:10px;color:#9E9E9E;margin-top:2px}
+.track-bar-mini{height:2px;background:#F0F0F0;border-radius:1px;margin-top:8px;overflow:hidden}
+.tbm-fill{height:100%;border-radius:1px;transition:width .8s ease}
+.track-list{padding:8px 13px 12px;flex:1;display:flex;flex-direction:column;gap:1px}
+.tl-row{display:flex;align-items:center;gap:7px;padding:4px 0;cursor:pointer}
+.tl-row:hover .tl-title{color:#0F0F0F}
+.tl-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.tl-title{font-size:11px;color:#525252;flex:1;line-height:1.35;transition:color .1s}
+.tl-date{font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;opacity:.7}
+.tl-empty{font-size:11px;color:#9E9E9E;font-style:italic;padding:2px 0}
+
+/* LOWER ROW */
+.lower-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 20px 20px}
+.lcard{background:#fff;border-radius:6px;border:1px solid #E4E4E4;overflow:hidden}
+.lcard-head{padding:10px 14px;border-bottom:1px solid #E4E4E4;display:flex;align-items:center;justify-content:space-between}
+.lcard-title{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.05em;text-transform:uppercase}
+.lcard-link{font-size:11px;font-weight:500;color:#0057FF;cursor:pointer;text-decoration:none;letter-spacing:0}
+.lcard-link:hover{color:var(--ink)}
+.lcard-body{padding:10px 14px}
+/* Milestones */
+.ms-item{display:flex;align-items:flex-start;gap:11px;margin-bottom:10px}
+.ms-item:last-child{margin-bottom:0}
+.ms-dot-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.ms-node{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff}
+.ms-node.done{background:#079455}.ms-node.next{background:#D97706;box-shadow:0 0 0 3px rgba(217,119,6,.15)}.ms-node.fut{background:#E4E4E4;color:#9E9E9E}.ms-node.launch{background:#0F0F0F;box-shadow:0 0 0 3px rgba(15,15,15,.12)}
+.ms-spine{width:1px;flex:1;min-height:10px;background:var(--line);margin:2px 0}
+.ms-content{flex:1;padding-top:1px}
+.ms-title{font-size:11px;font-weight:500;color:#0F0F0F;line-height:1.35}
+.ms-meta{display:flex;align-items:center;gap:7px;margin-top:2px}
+.ms-date{font-size:9.5px;color:var(--muted)}.ms-days{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px}
+.md-soon{background:#FEF3F2;color:#D92D20}.md-med{background:#FFFAEB;color:#D97706}.md-ok{background:#EFF8FF;color:#0057FF}.md-past{color:#9E9E9E}
+/* Finance mini */
+.fin-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F0F0F0}
+.fin-row:last-child{border-bottom:none}
+.fr-lbl{font-size:12px;color:#0F0F0F}.fr-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500}
+.fr-val.pos{color:#079455}.fr-val.neg{color:#D92D20}.fr-val.warn{color:#D97706}
+/* Upcoming mini */
+.up-row{display:flex;align-items:flex-start;gap:9px;padding:6px 0;border-bottom:1px solid #f3f1ec;cursor:pointer}
+.up-row:last-child{border-bottom:none}.up-row:hover .up-title{color:var(--plum)}
+.up-bar{width:2px;min-height:30px;border-radius:1px;flex-shrink:0;margin-top:3px}
+.up-title{font-size:12px;font-weight:500;color:#0F0F0F;flex:1;line-height:1.35;transition:color .1s}
+.up-meta{font-size:10px;color:#9E9E9E;margin-top:2px}
+.up-when{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.empty-st{font-size:11px;color:#9E9E9E;padding:6px 0}
+
+/* ═══════════════════ CAPTURE ═══════════════════ */
+#pg-capture{background:var(--paper)}
+.capture-inner{max-width:780px;margin:0 auto;padding:28px 24px}
+.capture-hero{margin-bottom:24px}
+.cap-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+.cap-sub{font-size:12.5px;color:var(--muted);line-height:1.65;max-width:520px}
+.cap-modes{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.cap-mode{padding:6px 14px;border-radius:5px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;font-family:'Inter',sans-serif}
+.cap-mode.active{border-color:#0F0F0F;background:#F4F4F4;color:#0F0F0F}
+.cap-mode .cm-icon{margin-right:5px}
+
+.cap-box{background:var(--card);border-radius:var(--r);border:1px solid var(--line);overflow:hidden}
+.cap-box-head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px}
+.cap-box-icon{font-size:16px}
+.cap-box-title{font-size:12px;font-weight:700;color:var(--text)}
+.cap-box-sub{font-size:10.5px;color:var(--muted);margin-left:auto}
+.cap-textarea{width:100%;padding:14px 16px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;border:none;outline:none;resize:none;background:transparent;line-height:1.65;min-height:120px}
+.cap-textarea::placeholder{color:var(--ghost)}
+.cap-footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.cap-hint{font-size:10.5px;color:var(--ghost);flex:1}
+.cap-btn{padding:6px 16px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.cap-btn:hover{background:var(--ink2)}.cap-btn:disabled{background:var(--line);color:var(--ghost);cursor:default}
+
+.cap-result{margin-top:16px;background:var(--card);border-radius:var(--r);border:1px solid var(--line);overflow:hidden}
+.cap-result-head{padding:11px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.crh-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.crh-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px}
+.crh-status.ok{background:rgba(58,122,92,.1);color:var(--sage)}
+.cap-result-body{padding:14px 16px}
+
+/* Result cards */
+.parsed-item{background:var(--paper);border-radius:5px;border:1px solid var(--line);padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
+.parsed-item:last-child{margin-bottom:0}
+.pi-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.pi-content{flex:1}
+.pi-type{font-size:8.5px;font-weight:700;color:var(--ghost);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.pi-title{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.35}
+.pi-detail{font-size:11px;color:var(--muted);line-height:1.5}
+.pi-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.pi-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px}
+.pi-actions{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.pi-btn{padding:4px 11px;border-radius:4px;border:1.5px solid;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s;background:transparent}
+.pi-btn.primary{border-color:var(--plum);color:var(--plum)}
+.pi-btn.primary:hover{background:rgba(124,92,154,.07)}
+.pi-btn.secondary{border-color:var(--line);color:var(--muted)}
+.pi-btn.secondary:hover{border-color:var(--lineb);color:var(--text)}
+
+.cap-save-all{width:100%;padding:10px;border-radius:5px;border:none;background:var(--sage);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;transition:all .13s}
+.cap-save-all:hover{background:#2d6648}
+
+/* capture templates */
+.cap-templates{margin-top:18px}
+.ct-title{font-size:9.5px;font-weight:700;color:var(--ghost);letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px}
+.ct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ct-card{background:var(--card);border-radius:var(--r);border:1px solid var(--line);padding:13px 14px;cursor:pointer;transition:all .12s}
+.ct-card:hover{border-color:var(--plum);transform:translateY(-1px)}
+.ct-icon{font-size:18px;margin-bottom:7px}
+.ct-name{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ct-desc{font-size:10.5px;color:var(--muted);line-height:1.45}
+.ct-example{font-size:9.5px;color:var(--ghost);margin-top:7px;font-style:italic;border-top:1px solid var(--line);padding-top:6px;line-height:1.45}
+
+/* Saved captures list */
+.saved-captures{margin-top:24px}
+.sc-item{background:var(--card);border-radius:5px;border:1px solid var(--line);padding:11px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:all .1s}
+.sc-item:hover{border-color:var(--lineb)}
+.sci-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.sci-body{flex:1}
+.sci-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.sci-meta{font-size:10px;color:var(--muted)}
+.sci-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;white-space:nowrap;align-self:flex-start;margin-top:2px}
+
+/* ═══════════════════ CALENDAR ═══════════════════ */
+#pg-cal{display:none}
+#pg-cal.active{display:flex;height:calc(100vh - 48px);overflow:hidden}
+#cal-main{flex:1;overflow-y:auto;padding:16px 20px}
+#cal-top{display:flex;align-items:center;gap:9px;margin-bottom:16px;flex-wrap:wrap}
+.arr{width:26px;height:26px;border-radius:4px;border:1px solid #E4E4E4;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .1s;color:#0F0F0F}
+.arr:hover{border-color:var(--plum);color:var(--plum)}
+#mnth-lbl{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#0F0F0F;min-width:150px;text-align:center;letter-spacing:-.01em}
+#view-sw{display:flex;background:#F0F0F0;border-radius:5px;padding:2px;gap:1px}
+.vtab{padding:4px 10px;border-radius:4px;border:none;background:transparent;color:#525252;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.vtab.active{background:#fff;color:#0F0F0F;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+#cat-bar{display:flex;gap:4px;flex-wrap:wrap}
+.cpill{padding:3px 9px;border-radius:4px;border:1.5px solid;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s;white-space:nowrap}
+/* Calendar cells */
+.cal-wrap{background:#fff;border-radius:6px;border:1px solid #E4E4E4;overflow:hidden}
+.day-nm-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line)}
+.dnm{padding:7px 0;text-align:center;font-size:9px;font-weight:700;color:var(--ghost);letter-spacing:.06em}
+.cells-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{min-height:86px;padding:5px 4px;border-right:1px solid #EDE9E1;border-bottom:1px solid #EDE9E1;cursor:pointer;transition:background .1s;position:relative}
+.cal-cell:hover:not(.empty-cell){background:#FAFAF6}
+.empty-cell{background:#FAFAF5;cursor:default}
+.cellnum{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--muted);margin-bottom:1px;font-weight:500}
+.cellnum.today{background:#0F0F0F;color:#fff;font-weight:600}
+.ev-chip{border-radius:3px;padding:2px 5px;font-size:9px;font-weight:700;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border-left:2px solid;transition:filter .08s}
+.ev-chip:hover{filter:brightness(.94)}
+.more-ev{font-size:9px;color:var(--ghost);padding-left:3px}
+.list-ev{background:var(--card);border-radius:6px;padding:9px 12px;margin-bottom:4px;display:flex;align-items:center;gap:11px;cursor:pointer;border:1px solid var(--line);transition:all .1s}
+.list-ev:hover{border-color:var(--plum)}.past-ev{opacity:.4}
+/* Calendar sidebar */
+#cal-sb{width:256px;border-left:1px solid #E4E4E4;background:#fff;display:flex;flex-direction:column;flex-shrink:0}
+#cstabs{display:flex;border-bottom:1px solid var(--line);flex-shrink:0}
+.cstab{flex:1;padding:9px 0;border:none;background:transparent;font-size:10px;font-weight:500;cursor:pointer;text-transform:uppercase;letter-spacing:.04em;color:#9E9E9E;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;transition:all .1s}
+.cstab.active{color:#0F0F0F;border-bottom-color:#0F0F0F}
+#cspanel{flex:1;overflow-y:auto;padding:13px}
+/* Cal sidebar items */
+.remind-item{background:#FAFAFD;border-radius:6px;padding:9px 11px;margin-bottom:7px;border:1px solid rgba(124,92,154,.1);border-left:2.5px solid var(--plum)}
+.remind-item.urgent{background:#FFFBF0;border-left-color:var(--gold);border-color:rgba(184,150,90,.1)}
+.remind-item.overdue{background:#FFF4F7;border-left-color:var(--rose);border-color:rgba(176,64,96,.1)}
+.ri-title{font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ri-why{font-family:'Inter',sans-serif;font-size:13px;font-style:italic;margin-bottom:5px;line-height:1.4;color:var(--plum)}
+.remind-item.urgent .ri-why{color:#8A6020}.remind-item.overdue .ri-why{color:var(--rose)}
+.ri-action{font-size:10px;color:var(--muted);background:rgba(0,0,0,.025);border-radius:3px;padding:3px 7px;margin-bottom:5px}
+.ri-btns{display:flex;gap:4px}
+.ri-btn{padding:3px 9px;border-radius:3px;border:none;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.ri-btn.pri{background:var(--plum);color:#fff}.ri-btn.sec{background:var(--line);color:var(--muted)}
+.smode-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:9px}
+.smode{padding:7px 8px;border-radius:5px;border:1.5px solid var(--line);background:#fafafa;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;line-height:1.35;transition:all .1s}
+.smode.active{border-color:var(--plum);background:rgba(124,92,154,.06);color:var(--plum)}
+.gen-ctx{width:100%;background:#fafafa;border:1.5px solid var(--line);border-radius:5px;color:var(--text);font-size:11px;padding:8px 10px;font-family:'Inter',sans-serif;resize:none;outline:none;line-height:1.5;margin-bottom:6px;transition:border .1s}
+.gen-ctx:focus{border-color:var(--plum)}
+.gen-btn{width:100%;padding:8px;border-radius:5px;border:none;background:var(--ink);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:11px;letter-spacing:.03em;transition:all .13s}
+.gen-btn:hover{background:var(--ink2)}.gen-btn:disabled{background:var(--line);color:var(--ghost);cursor:default}
+.upitem{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.upitem:last-child{border-bottom:none}.upitem:hover .ui-title{color:var(--plum)}
+.ui-bar{width:2px;height:28px;border-radius:1px;flex-shrink:0;margin-top:2px}
+.ui-title{font-size:11px;font-weight:600;color:var(--text);line-height:1.3;transition:color .1s}
+.ui-meta{font-size:9.5px;color:var(--muted);margin-top:1px}
+.updays{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;color:var(--ghost)}
+/* milestone view */
+.ms-view-wrap{position:relative;padding-left:22px}
+.ms-spine-v{position:absolute;left:7px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--plum),var(--gold));opacity:.2}
+.ms-cv{background:var(--card);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;border:1px solid var(--line);position:relative}
+.ms-cv-dot{position:absolute;left:-17px;top:50%;transform:translateY(-50%);width:11px;height:11px;border-radius:50%;border:2px solid var(--paper)}
+.launch-card{background:linear-gradient(135deg,var(--ink2),var(--ink3));border-radius:var(--r);padding:20px;margin-bottom:9px;border:1px solid rgba(184,150,90,.12);position:relative;overflow:hidden}
+.launch-card::after{content:'LAUNCH';position:absolute;font-size:70px;font-weight:800;color:rgba(255,255,255,.02);bottom:-12px;right:10px;font-family:'Inter',sans-serif;pointer-events:none}
+
+/* ═══════════════════ FINANCE ═══════════════════ */
+#pg-fin{background:var(--paper)}
+.fin-inner{max-width:860px;margin:0 auto;padding:24px}
+.fin-hero{background:#fff;border:1px solid #E4E4E4;border-radius:6px;padding:18px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-bottom:14px;position:relative;overflow:hidden}
+
+.fh-stat{padding:0 20px;border-right:1px solid #E4E4E4}
+.fh-stat:first-child{padding-left:0}.fh-stat:last-child{border-right:none;padding-right:0}
+.fh-lbl{font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.fh-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;line-height:1;margin-bottom:3px;letter-spacing:-.02em}
+.v-sage{color:#079455}.v-rose{color:#D92D20}.v-amber{color:#D97706}
+.fh-note{font-size:11px;color:#9E9E9E}
+.fsec{background:#fff;border-radius:6px;border:1px solid #E4E4E4;margin-bottom:10px}
+.fsec-head{padding:10px 16px;border-bottom:1px solid #E4E4E4;font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.05em;text-transform:uppercase}
+.fsec-body{padding:14px 18px}
+.ftable{width:100%;border-collapse:collapse}
+.ftable th{text-align:left;font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #E4E4E4}
+.ftable td{padding:7px 8px;font-size:12px;border-bottom:1px solid #F4F4F4;color:#0F0F0F}
+.ftable tr:last-child td{border-bottom:none}
+.ftable td.p{color:#079455;font-weight:600;font-family:'JetBrains Mono',monospace}.ftable td.n{color:#D92D20;font-weight:600;font-family:'JetBrains Mono',monospace}
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700}
+.upload-zone{border:2px dashed var(--line);border-radius:6px;padding:24px;text-align:center;cursor:pointer;background:#FAFAF7;transition:all .15s}
+.upload-zone:hover{border-color:var(--plum);background:rgba(124,92,154,.03)}
+.upload-zone p{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.55}
+
+/* ═══════════════════ CONNECTIONS ═══════════════════ */
+#pg-connect{background:var(--paper)}
+.connect-inner{max-width:860px;margin:0 auto;padding:24px}
+.connect-intro{margin-bottom:22px}
+.connect-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+.connect-sub{font-size:12.5px;color:var(--muted);line-height:1.65;max-width:500px}
+
+/* Connection status bar */
+.conn-status-bar{background:#fff;border-radius:6px;border:1px solid #E4E4E4;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.csb-lbl{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.csb-chip{font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;border:1.5px solid}
+.csb-chip.on{border-color:rgba(7,148,85,.25);background:#ECFDF3;color:#079455}
+.csb-chip.off{border-color:var(--line);color:var(--ghost);background:transparent}
+
+/* Group headings */
+.conn-group-title{font-size:9px;font-weight:700;color:var(--ghost);letter-spacing:.16em;text-transform:uppercase;margin-bottom:11px;margin-top:6px;display:flex;align-items:center;gap:10px}
+.conn-group-title::after{content:'';flex:1;height:1px;background:var(--line)}
+.conn-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:20px}
+
+/* Connection card */
+.conn-card{background:#fff;border-radius:6px;border:1px solid #E4E4E4;padding:14px 16px;transition:all .1s;position:relative}
+.conn-card.ic-connected{border-color:rgba(58,122,92,.25)}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.cc-left{display:flex;align-items:center;gap:10px}
+.cc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cc-name{font-size:12px;font-weight:600;color:#0F0F0F}
+.cc-tagline{font-size:10.5px;color:var(--muted);margin-top:1px}
+.cc-status{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:3px;flex-shrink:0;letter-spacing:.04em}
+.cc-status.connected{background:#ECFDF3;color:#079455}
+.cc-status.setup{background:#EFF8FF;color:#0057FF}
+.cc-status.not{background:#F4F4F4;color:#9E9E9E}
+.cc-desc{font-size:11px;color:#525252;line-height:1.55;margin-bottom:10px}
+.cc-feats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px}
+.cc-feat{font-size:9.5px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.cc-action{display:flex;gap:7px;align-items:center}
+.cc-input{flex:1;background:var(--paper);border:1.5px solid var(--line);border-radius:5px;color:var(--text);font-size:11.5px;padding:7px 10px;font-family:'Inter',sans-serif;outline:none;transition:border .1s;min-width:0}
+.cc-input:focus{border-color:var(--plum)}
+.cc-input::placeholder{color:var(--ghost)}
+.cc-save{padding:6px 13px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .1s}
+.cc-save:hover{background:var(--ink2)}
+.cc-btn{padding:7px 14px;border-radius:5px;border:1.5px solid var(--line);background:transparent;color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .12s}
+.cc-btn:hover{border-color:var(--plum);color:var(--plum)}
+.cc-instructions{background:var(--paper);border-radius:5px;padding:11px 13px;margin-top:9px;font-size:11px;color:var(--muted);line-height:1.65;border:1px solid var(--line);display:none}
+.cc-instructions ol{padding-left:15px}.cc-instructions li{margin-bottom:4px}
+.cc-instructions code{background:var(--line);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10.5px}
+
+/* How it works */
+.how-section{background:var(--card);border-radius:var(--r);border:1px solid var(--line);padding:18px 20px;margin-top:8px}
+.how-title{font-size:11px;font-weight:700;color:var(--text);margin-bottom:13px}
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.how-step{text-align:center;padding:12px 8px}
+.hs-num{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.hs-title{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px}
+.hs-desc{font-size:10px;color:var(--muted);line-height:1.5}
+
+/* ═══════════════════ MODALS & UTILS ═══════════════════ */
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:14px}
+#modal-bg.open{display:flex}
+#modal{background:#fff;border-radius:8px;padding:20px;width:440px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.06)}
+.m-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.m-title{font-size:14px;font-weight:600;color:#0F0F0F}
+.m-x{background:none;border:none;font-size:17px;cursor:pointer;color:var(--ghost);transition:color .1s}.m-x:hover{color:var(--text)}
+.m-lbl{display:block;font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;margin:12px 0 5px}
+.m-input{width:100%;padding:7px 10px;border-radius:4px;border:1px solid #E4E4E4;font-size:12px;color:#0F0F0F;font-family:'Inter',sans-serif;outline:none;transition:border .1s;background:#fff}
+.m-input:focus{border-color:#0F0F0F;background:#fff}
+.m-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cat-opts,.own-opts,.pri-opts{display:flex;gap:5px;flex-wrap:wrap}
+.copt,.oopt,.popt{padding:6px 10px;border-radius:5px;border:1.5px solid var(--line);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;background:#fafafa;transition:all .1s;display:flex;align-items:center;gap:5px}
+.m-ftr{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:7px}
+.m-del{padding:7px 13px;border-radius:5px;border:1.5px solid #fee2e2;background:#fff;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.m-cancel{padding:7px 13px;border-radius:5px;border:1.5px solid var(--line);background:#fff;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.m-save{padding:7px 18px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.m-save:hover{background:var(--ink2)}
+
+#sync-drawer{position:fixed;bottom:0;left:0;right:0;background:#1A1A1A;border-top:1px solid rgba(255,255,255,.08);padding:10px 20px;display:flex;align-items:center;gap:10px;z-index:300;transform:translateY(100%);transition:transform .24s ease}
+#sync-drawer.open{transform:translateY(0)}
+.sd-lbl{color:#D97706;font-weight:600;font-size:11px;white-space:nowrap}
+#sd-input{flex:1;max-width:460px;background:rgba(255,255,255,.06);border:1px solid rgba(184,150,90,.16);border-radius:5px;padding:7px 11px;color:#fff;font-size:12px;font-family:'Inter',sans-serif;outline:none}
+#sd-input:focus{border-color:rgba(184,150,90,.38)}.#sd-input::placeholder{color:rgba(255,255,255,.22)}
+.sd-save{padding:6px 13px;border-radius:4px;border:none;background:#fff;color:#0F0F0F;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.sd-x{background:none;border:none;color:rgba(255,255,255,.22);cursor:pointer;font-size:17px;padding:2px 5px}
+
+#toast{position:fixed;bottom:20px;right:20px;z-index:600;background:#0F0F0F;color:#fff;padding:8px 14px;border-radius:5px;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;border:1px solid rgba(255,255,255,.1);opacity:0;transform:translateY(6px);transition:all .18s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* ═══════════════════ WORK TRACKER ═══════════════════ */
+#pg-work{background:var(--paper)}
+.work-inner{padding:24px;max-width:1300px}
+.work-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:16px}
+.work-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.work-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6;max-width:460px}
+.work-header-right{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.wh-btn{padding:6px 14px;border-radius:5px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.wh-btn:hover{border-color:var(--plum);color:var(--plum)}
+.wh-btn.primary{background:#0F0F0F;color:#fff;border-color:#0F0F0F}
+.wh-btn.primary:hover{background:var(--ink2)}
+
+/* Founder columns */
+.work-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.founder-col{background:#fff;border-radius:6px;border:1px solid #E4E4E4;overflow:hidden;display:flex;flex-direction:column}
+.fc-header{padding:14px 16px 12px;border-bottom:1px solid var(--line)}
+.fc-founder{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fc-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.fc-name{font-size:12px;font-weight:600;color:#0F0F0F}
+.fc-role{font-size:10px;color:#9E9E9E;margin-top:1px}
+.fc-stats{display:flex;gap:8px}
+.fc-stat{flex:1;padding:6px 9px;background:var(--paper);border-radius:4px;text-align:center}
+.fcs-num{font-family:'Inter',sans-serif;font-size:20px;font-weight:600;line-height:1}
+.fcs-lbl{font-size:8.5px;color:var(--ghost);margin-top:1px;letter-spacing:.04em}
+.fcs-num.open{color:var(--plum)}.fcs-num.due{color:var(--rose)}.fcs-num.done{color:var(--sage)}
+
+.fc-body{flex:1;padding:10px 14px 14px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:420px}
+.task-card{background:#F9F9F9;border-radius:4px;border:1px solid #E4E4E4;padding:8px 10px;cursor:pointer;transition:all .1s;position:relative;border-left:3px solid transparent}
+.task-card:hover{border-color:var(--lineb);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card.pri-critical{border-left-color:#D92D20}
+.task-card.pri-high{border-left-color:#D97706}
+.task-card.pri-medium{border-left-color:#CFCFCF}
+.task-card.pri-low{border-left-color:var(--line)}
+.task-card.status-done{opacity:.45}
+.task-card.status-done .tc-title{text-decoration:line-through}
+.tc-top{display:flex;align-items:flex-start;gap:7px;margin-bottom:5px}
+.tc-check{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--lineb);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;font-size:8px}
+.tc-check.checked{background:var(--sage);border-color:var(--sage);color:#fff}
+.tc-title{font-size:12px;font-weight:500;color:#0F0F0F;flex:1;line-height:1.4}
+.tc-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-cat{font-size:9px;font-weight:700;padding:1.5px 6px;border-radius:3px}
+.tc-due{font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.tc-due.overdue{color:var(--rose)}.tc-due.soon{color:var(--amber)}.tc-due.ok{color:var(--ghost)}
+.tc-note{font-size:10px;color:var(--muted);line-height:1.4;margin-top:4px}
+
+.fc-add{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
+.fc-add-input{flex:1;background:var(--paper);border:1.5px solid var(--line);border-radius:5px;padding:6px 9px;font-size:11.5px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border .1s}
+.fc-add-input:focus{border-color:var(--plum)}
+.fc-add-input::placeholder{color:var(--ghost)}
+.fc-add-btn{padding:6px 11px;border-radius:5px;border:none;background:var(--ink);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0}
+
+/* Responsibility matrix */
+.resp-matrix{background:#fff;border-radius:6px;border:1px solid #E4E4E4;overflow:hidden;margin-bottom:16px}
+.rm-head{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.rm-title{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.05em;text-transform:uppercase}
+.rm-table{width:100%;border-collapse:collapse}
+.rm-table th{padding:8px 13px;text-align:left;font-size:10px;font-weight:500;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid #E4E4E4;background:#F9F9F9}
+.rm-table th.founder-th{text-align:center;width:90px}
+.rm-table td{padding:7px 13px;font-size:12px;border-bottom:1px solid #F4F4F4;color:#0F0F0F}
+.rm-table tr:last-child td{border-bottom:none}
+.rm-table tr:hover td{background:#F9F9F9}
+.rmt-domain{font-weight:600}
+.rmt-task{font-size:10.5px;color:var(--muted);margin-top:1px}
+.resp-cell{text-align:center}
+.resp-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:9px;font-weight:800;cursor:default}
+.rb-lead{background:#0F0F0F;color:#fff}
+.rb-support{background:var(--line);color:var(--muted)}
+.rb-review{background:#FFFAEB;color:#D97706}
+.rb-none{background:transparent;color:var(--line)}
+
+/* Task modal */
+#task-modal-bg{position:fixed;inset:0;background:rgba(5,4,12,.5);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;padding:14px}
+#task-modal-bg.open{display:flex}
+#task-modal{background:var(--card);border-radius:10px;padding:22px;width:420px;max-width:96vw;box-shadow:0 28px 60px rgba(0,0,0,.2)}
+.tm-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.tm-title{font-size:14px;font-weight:700}
+.tm-x{background:none;border:none;font-size:17px;cursor:pointer;color:var(--ghost)}
+
+/* ═══════════════════ GANTT CHART ═══════════════════ */
+#pg-gantt{background:var(--paper);overflow:hidden;display:none}
+#pg-gantt.active{display:flex;flex-direction:column;height:calc(100vh - 48px)}
+.gantt-toolbar{background:#fff;border-bottom:1px solid #E4E4E4;padding:9px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.gantt-title{font-size:12px;font-weight:600;color:#0F0F0F;flex:1}
+.gz-btn{padding:4px 11px;border-radius:4px;border:1px solid #E4E4E4;background:#fff;color:#525252;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.gz-btn:hover{border-color:#0F0F0F;color:#0F0F0F}
+.gz-btn.active{background:#0F0F0F;color:#fff;border-color:#0F0F0F}
+.gantt-wrap{flex:1;overflow:auto;padding:20px 22px}
+.gantt-container{min-width:900px}
+
+/* Gantt header — month columns */
+.gantt-head-row{display:flex;margin-bottom:6px;padding-left:200px}
+.gantt-month{flex:1;text-align:center;font-size:9px;font-weight:700;color:var(--ghost);letter-spacing:.1em;text-transform:uppercase;border-left:1px solid var(--line);padding:4px 0}
+.gantt-month:first-child{border-left:none}
+.gantt-month.cur{color:#D97706;font-weight:600}
+
+/* Gantt function groups */
+.gantt-group{margin-bottom:4px}
+.gantt-group-label{display:flex;align-items:center;height:30px;padding-left:12px}
+.gg-icon{font-size:12px;margin-right:7px}
+.gg-name{font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.gantt-row{display:flex;align-items:center;height:32px;border-radius:3px;transition:background .1s}
+.gantt-row:hover{background:#F9F9F9}
+.gantt-row-label{width:200px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 10px 0 24px}
+.grl-owners{display:flex;gap:2px}
+.grl-owner{width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff}
+.grl-title{font-size:11px;font-weight:400;color:#0F0F0F;line-height:1.3;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gantt-timeline{flex:1;position:relative;height:34px}
+.gantt-grid{position:absolute;inset:0;display:flex;pointer-events:none}
+.gantt-col{flex:1;border-left:1px solid #F0EDE7;height:100%}
+.gantt-col.cur-month{background:#FAFAF9}
+.gantt-bar-wrap{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:3px;cursor:pointer;transition:filter .1s;display:flex;align-items:center;overflow:hidden}
+.gantt-bar-wrap:hover{filter:brightness(.9)}
+.gantt-bar-inner{height:100%;border-radius:4px;opacity:.85;flex:1}
+.gantt-bar-label{font-size:9px;font-weight:700;color:#fff;padding:0 6px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.2);flex-shrink:0}
+.gantt-today-line{position:absolute;top:0;bottom:0;width:1px;background:#D92D20;opacity:.6;pointer-events:none;z-index:10}
+.gantt-milestone-marker{position:absolute;top:50%;transform:translateY(-50%) rotate(45deg);width:8px;height:8px;background:#D97706;cursor:pointer;z-index:5;transition:transform .1s}
+.gantt-milestone-marker:hover{transform:translateY(-50%) rotate(45deg) scale(1.3)}
+
+/* Gantt legend */
+
+/* ═══════════════════ COLLECTION TRACKER ═══════════════════ */
+#pg-col{background:#F9F9F9}
+.col-inner{padding:16px 20px}
+.col-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.col-title-row{display:flex;align-items:baseline;gap:10px;flex:1}
+.col-h1{font-size:14px;font-weight:600;color:#0F0F0F;letter-spacing:-.01em}
+.col-count{font-size:11px;color:#9E9E9E}
+.col-filter-row{display:flex;gap:5px}
+.cf{padding:3px 10px;border-radius:4px;border:1px solid #E4E4E4;background:#fff;font-size:11px;font-weight:500;color:#525252;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.cf.active{background:#0F0F0F;color:#fff;border-color:#0F0F0F}
+.col-add-btn{padding:5px 13px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+
+/* Table */
+.col-table-wrap{background:#fff;border:1px solid #E4E4E4;border-radius:6px;overflow:hidden;margin-bottom:16px}
+.col-table{width:100%;border-collapse:collapse;font-size:12px}
+.col-table thead th{padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid #E4E4E4;background:#F9F9F9;white-space:nowrap}
+.col-table tbody tr{border-bottom:1px solid #F0F0F0;cursor:pointer;transition:background .08s}
+.col-table tbody tr:last-child{border-bottom:none}
+.col-table tbody tr:hover{background:#FAFAFA}
+.col-table tbody tr.row-selected{background:#F4F7FF}
+.col-table td{padding:10px 12px;vertical-align:middle;color:#0F0F0F}
+.col-table td.td-ms{font-family:'JetBrains Mono',monospace;font-size:10px;color:#9E9E9E}
+.col-table td.td-name{font-weight:500}
+.col-table td.td-factory .ftag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;background:#F4F4F4;border:1px solid #E4E4E4;color:#525252;white-space:nowrap}
+.col-table td.td-stage .stage-mini{display:flex;gap:2px;align-items:center}
+.sm-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;flex-shrink:0}
+.sm-done{background:#ECFDF3;color:#079455;border:1px solid #A9EFC5}
+.sm-active{background:#0F0F0F;color:#fff}
+.sm-todo{background:#F4F4F4;color:#CFCFCF;border:1px solid #E4E4E4}
+.sm-line{flex:1;height:1px;background:#E4E4E4;min-width:4px}
+.sm-line-done{background:#A9EFC5}
+.col-table td.td-blocker .blocker-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;background:#FEF3F2;color:#D92D20;border:1px solid #FECDCA}
+.owner-dot{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;margin-right:2px}
+
+/* Detail panel */
+.col-detail{background:#fff;border:1px solid #E4E4E4;border-radius:6px;overflow:hidden;margin-bottom:16px;display:none}
+.col-detail.open{display:block}
+.cd-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #E4E4E4}
+.cd-head-left{display:flex;align-items:baseline;gap:8px}
+.cd-ms-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#9E9E9E}
+.cd-style-name{font-size:14px;font-weight:600;color:#0F0F0F}
+.cd-close{background:none;border:1px solid #E4E4E4;border-radius:4px;padding:3px 8px;font-size:11px;color:#525252;cursor:pointer;font-family:'Inter',sans-serif}
+.cd-body{padding:16px}
+.cd-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.cd-field{background:#F9F9F9;border-radius:4px;border:1px solid #E4E4E4;padding:10px 12px;position:relative}
+.cd-field-label{font-size:9px;font-weight:600;color:#9E9E9E;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.cd-field-val{font-size:12px;font-weight:500;color:#0F0F0F;min-height:18px;word-break:break-word}
+.cd-field-val.editable{cursor:text;border-radius:3px;padding:1px 3px;margin:-1px -3px;transition:background .1s}
+.cd-field-val.editable:hover{background:#F0F0F0}
+.cd-field-val.editable:focus{background:#fff;outline:2px solid #0F0F0F;outline-offset:1px}
+.edit-hint{font-size:9px;color:#CFCFCF;font-style:italic}
+
+/* Stage pipeline */
+.cd-stages-label{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.cd-pipeline{display:flex;gap:0;border:1px solid #E4E4E4;border-radius:4px;overflow:hidden;margin-bottom:14px}
+.pipe-step{flex:1;padding:8px 6px;text-align:center;font-size:10px;font-weight:500;cursor:pointer;transition:all .1s;border-right:1px solid #E4E4E4;position:relative;user-select:none}
+.pipe-step:last-child{border-right:none}
+.pipe-step.ps-done{background:#ECFDF3;color:#079455}
+.pipe-step.ps-active{background:#0F0F0F;color:#fff;font-weight:600}
+.pipe-step.ps-todo{background:#fff;color:#9E9E9E}
+.pipe-step:hover.ps-todo{background:#F9F9F9}
+.pipe-step-num{font-size:8px;display:block;margin-bottom:2px;opacity:.6}
+
+/* Notes and actions */
+.cd-notes-label{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.cd-notes{width:100%;font-size:12px;color:#0F0F0F;font-family:'Inter',sans-serif;border:1px solid #E4E4E4;border-radius:4px;padding:8px 10px;resize:vertical;min-height:60px;background:#fff;outline:none;line-height:1.6;transition:border .1s}
+.cd-notes:focus{border-color:#0F0F0F}
+.cd-action-row{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.cd-btn{padding:5px 13px;border-radius:4px;border:1px solid #E4E4E4;background:#fff;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:#0F0F0F;transition:all .1s}
+.cd-btn:hover{border-color:#0F0F0F}
+.cd-btn.primary{background:#0F0F0F;color:#fff;border-color:#0F0F0F}
+.cd-btn.danger{border-color:#FECDCA;color:#D92D20}
+.cd-btn.danger:hover{background:#FEF3F2}
+
+/* Style modal */
+#style-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:14px}
+#style-modal-bg.open{display:flex}
+#style-modal{background:#fff;border-radius:8px;padding:20px;width:500px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.sm-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sm-title{font-size:14px;font-weight:600;color:#0F0F0F}
+.sm-x{background:none;border:none;font-size:17px;cursor:pointer;color:#9E9E9E}
+.sm-lbl{display:block;font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;margin:12px 0 5px}
+.sm-input{width:100%;padding:7px 10px;border-radius:4px;border:1px solid #E4E4E4;font-size:12px;color:#0F0F0F;font-family:'Inter',sans-serif;outline:none;background:#fff;transition:border .1s}
+.sm-input:focus{border-color:#0F0F0F}
+.sm-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sm-opts{display:flex;gap:5px;flex-wrap:wrap}
+.sm-opt{padding:5px 10px;border-radius:4px;border:1px solid #E4E4E4;background:#fff;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:#525252;transition:all .1s}
+.sm-opt.selected{background:#0F0F0F;color:#fff;border-color:#0F0F0F}
+.sm-ftr{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+
+/* How-to guide panel */
+.howto-panel{background:#fff;border:1px solid #E4E4E4;border-radius:6px;overflow:hidden}
+.howto-head{padding:10px 14px;border-bottom:1px solid #E4E4E4;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.howto-title{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.05em;text-transform:uppercase}
+.howto-body{padding:14px 16px;display:none}
+.howto-body.open{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hw-card{background:#F9F9F9;border-radius:4px;border:1px solid #E4E4E4;padding:10px 12px}
+.hw-label{font-size:10px;font-weight:600;color:#0F0F0F;margin-bottom:5px}
+.hw-text{font-size:11px;color:#525252;line-height:1.55}
+.hw-code{font-family:'JetBrains Mono',monospace;font-size:10px;background:#F0F0F0;padding:2px 5px;border-radius:2px;color:#0F0F0F}
+
+.gantt-legend{display:flex;align-items:center;gap:16px;padding:8px 20px;border-top:1px solid #E4E4E4;background:#fff;flex-shrink:0;flex-wrap:wrap}
+.gl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.gl-swatch{width:10px;height:10px;border-radius:2px}
+.gl-today{width:2px;height:12px;background:var(--rose);opacity:.6}
+.gl-milestone{width:8px;height:8px;transform:rotate(45deg);background:var(--gold)}
+</style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<nav id="sb">
+  <div class="sb-brand">
+    <div class="sb-name">PROPHECY</div>
+    <div class="sb-tag">Command · Bangkok</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">Workspace</div>
+    <button class="snav active" onclick="showPage('overview')">
+      <span class="si">⊞</span> Overview
+    </button>
+    <button class="snav" onclick="showPage('capture')">
+      <span class="si">⚡</span> Quick Capture
+      <span class="sn-badge" id="cap-badge"></span>
+    </button>
+    <button class="snav" onclick="showPage('col')">
+      <span class="si">◉</span> Collection
+      <span class="sn-badge" id="col-badge"></span>
+    </button>
+    <button class="snav" onclick="showPage('work')">
+      <span class="si">◈</span> Work Tracker
+      <span class="sn-badge" id="work-badge"></span>
+    </button>
+    <button class="snav" onclick="showPage('gantt')">
+      <span class="si">▤</span> Gantt Chart
+    </button>
+    <button class="snav" onclick="showPage('cal')">
+      <span class="si">◻</span> Calendar
+    </button>
+    <button class="snav" onclick="showPage('fin')">
+      <span class="si">฿</span> Finance
+    </button>
+    <div class="sb-sec">Setup</div>
+    <button class="snav" onclick="showPage('connect')">
+      <span class="si">⟷</span> Connections
+      <span class="sn-badge" id="conn-badge">0</span>
+    </button>
+  </div>
+  <div class="sb-bottom">
+    <button class="sb-sync-row offline" id="sb-sync-btn" onclick="toggleSyncDrawer()">
+      <span class="sdot"></span>
+      <span id="sb-sync-txt">Not synced</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<div id="main">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div id="tb-title">Overview</div>
+    <div class="fp-row" id="founder-pills"></div>
+    <div id="countdown-chip">
+      <div class="cd-blink"></div>
+      <div>
+        <div id="cdtxt" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:700">— d</div>
+        <div class="cd-sub">to launch</div>
+      </div>
+    </div>
+    <button id="add-btn" onclick="openModal(null)">+ Event</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       OVERVIEW PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-overview" class="page active">
+
+    <!-- SITUATION BAR -->
+    <div class="sit-bar">
+      <div class="sit-row1">
+        <div class="sit-txt">
+          <div class="sit-eye">Prophecy HQ · Weekly Situation</div>
+          <div class="sit-headline">Where we stand, right now
+            <button class="sit-refresh" onclick="loadInsight(true)" title="Refresh">↺</button>
+          </div>
+          <div class="sit-brief"><span id="insight-txt">Loading your briefing…</span></div>
+        </div>
+      </div>
+      <div class="sit-kpis">
+        <div class="kpi-c">
+          <div class="kpi-lbl">Days to Launch</div>
+          <div class="kpi-v vg" id="kpi-days">—</div>
+          <div class="kpi-n">July 1, 2026</div>
+        </div>
+        <div class="kpi-c">
+          <div class="kpi-lbl">Next Milestone</div>
+          <div class="kpi-v va" style="font-size:18px;padding-top:4px" id="kpi-next-ms">—</div>
+          <div class="kpi-n" id="kpi-next-ms-label">Loading…</div>
+        </div>
+        <div class="kpi-c">
+          <div class="kpi-lbl">Net Cash Position</div>
+          <div class="kpi-v vr">−฿4,682</div>
+          <div class="kpi-n">Top-up needed</div>
+        </div>
+        <div class="kpi-c">
+          <div class="kpi-lbl">Active Tasks</div>
+          <div class="kpi-v vg" id="kpi-tasks">—</div>
+          <div class="kpi-n">Next 14 days</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN TRACKS -->
+    <div class="tracks-outer">
+      <div class="section-eyebrow">Domain Tracks</div>
+      <div class="tracks-grid" id="tracks-grid"></div>
+    </div>
+
+    <!-- LOWER ROW -->
+    <div class="lower-row">
+      <!-- MILESTONES -->
+      <div class="lcard">
+        <div class="lcard-head">
+          <span class="lcard-title">Launch Timeline</span>
+          <span class="lcard-link" onclick="showPage('cal');setTimeout(()=>setView('milestones'),80)">Full view →</span>
+        </div>
+        <div class="lcard-body" id="dash-ms"></div>
+      </div>
+      <!-- FINANCE -->
+      <div class="lcard">
+        <div class="lcard-head">
+          <span class="lcard-title">Finance Snapshot</span>
+          <span class="lcard-link" onclick="showPage('fin')">Details →</span>
+        </div>
+        <div class="lcard-body" id="dash-fin">
+          <div class="fin-row"><span class="fr-lbl">Founder Equity</span><span class="fr-val pos">+฿150,000</span></div>
+          <div class="fin-row"><span class="fr-lbl">Total Expenses</span><span class="fr-val neg">−฿154,682</span></div>
+          <div class="fin-row"><span class="fr-lbl" style="font-weight:700">Net Position</span><span class="fr-val warn" style="font-weight:700">−฿4,682</span></div>
+          <div class="fin-row"><span class="fr-lbl">Next Top-up</span><span class="fr-val" style="color:var(--muted)">TBD</span></div>
+          <div style="margin-top:9px;padding:7px 9px;background:rgba(176,64,96,.05);border-radius:4px;border-left:2px solid var(--rose)">
+            <div style="font-size:10px;font-weight:700;color:var(--rose)">Action required</div>
+            <div style="font-size:10.5px;color:var(--muted);margin-top:1px">Founders top-up before April fabric sourcing trip</div>
+          </div>
+        </div>
+      </div>
+      <!-- COMING UP -->
+      <div class="lcard">
+        <div class="lcard-head">
+          <span class="lcard-title">Coming Up</span>
+          <span class="lcard-link" onclick="showPage('cal')">Calendar →</span>
+        </div>
+        <div class="lcard-body" id="dash-up"></div>
+      </div>
+    </div>
+
+  </div><!-- /pg-overview -->
+
+  <!-- ══════════════════════════════════════════════
+       QUICK CAPTURE PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-capture" class="page">
+    <div class="capture-inner">
+
+      <div class="capture-hero">
+        <div class="cap-title">Quick Capture</div>
+        <div class="cap-sub">Paste raw notes, LINE decisions, sample feedback, or vendor info. AI structures it and saves everything to the right place — calendar, finance, or your production tracker.</div>
+        <div class="cap-modes">
+          <button class="cap-mode active" onclick="setCapMode('auto')"><span class="cm-icon">✦</span>Auto-detect</button>
+          <button class="cap-mode" onclick="setCapMode('decision')"><span class="cm-icon">💬</span>Team decision</button>
+          <button class="cap-mode" onclick="setCapMode('sample')"><span class="cm-icon">🧵</span>Sample notes</button>
+          <button class="cap-mode" onclick="setCapMode('vendor')"><span class="cm-icon">📋</span>Vendor / supplier</button>
+          <button class="cap-mode" onclick="setCapMode('expense')"><span class="cm-icon">฿</span>Expense / receipt</button>
+          <button class="cap-mode" onclick="setCapMode('task')"><span class="cm-icon">✓</span>Task / deadline</button>
+        </div>
+      </div>
+
+      <div class="cap-box">
+        <div class="cap-box-head">
+          <span class="cap-box-icon" id="cap-icon">✦</span>
+          <span class="cap-box-title" id="cap-box-title">Paste anything here</span>
+          <span class="cap-box-sub" id="cap-box-sub">AI will detect the type automatically</span>
+        </div>
+        <textarea class="cap-textarea" id="cap-input" placeholder="Paste from LINE, type notes, or drop text here…
+
+Examples:
+— &quot;Guy confirmed we're going with the silk-linen blend for the hero piece. Need to order 80m by April 1.&quot;
+— &quot;Supplier K.Malee quoted 850 THB/m for the crêpe. Min order 50m. Need decision by Friday.&quot;
+— &quot;Sample 3 feedback: neckline too wide, sleeve length +2cm, back dart needs adjusting. Re-fit in 2 weeks.&quot;"></textarea>
+        <div class="cap-footer">
+          <span class="cap-hint" id="cap-hint">The AI will extract events, tasks, contacts, and decisions automatically</span>
+          <button class="cap-btn" id="cap-btn" onclick="runCapture()">✦ Process &amp; Structure</button>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="cap-result" id="cap-result" style="display:none">
+        <div class="cap-result-head">
+          <span class="crh-title">Structured Output</span>
+          <span class="crh-status ok" id="crh-status">Ready to save</span>
+        </div>
+        <div class="cap-result-body" id="cap-result-body"></div>
+        <div style="padding:0 16px 14px">
+          <button class="cap-save-all" id="cap-save-btn" onclick="saveAllCaptures()">Save all to Prophecy →</button>
+        </div>
+      </div>
+
+      <!-- TEMPLATES -->
+      <div class="cap-templates">
+        <div class="ct-title">Capture templates</div>
+        <div class="ct-grid">
+          <div class="ct-card" onclick="fillTemplate('sample')">
+            <div class="ct-icon">🧵</div>
+            <div class="ct-name">Sample Review</div>
+            <div class="ct-desc">Log feedback from a fitting or sample review. Issues, changes, next steps.</div>
+            <div class="ct-example">"Sample 3 — neckline too wide, adjust sleeve +2cm, re-fit 2 weeks"</div>
+          </div>
+          <div class="ct-card" onclick="fillTemplate('vendor')">
+            <div class="ct-icon">📋</div>
+            <div class="ct-name">Vendor Note</div>
+            <div class="ct-desc">Capture supplier quotes, contact info, MOQs, and lead times.</div>
+            <div class="ct-example">"K.Malee Textiles: 850 THB/m, crêpe, MOQ 50m, decision needed Fri"</div>
+          </div>
+          <div class="ct-card" onclick="fillTemplate('decision')">
+            <div class="ct-icon">💬</div>
+            <div class="ct-name">Team Decision</div>
+            <div class="ct-desc">Log decisions from LINE chats or meetings so nothing gets lost.</div>
+            <div class="ct-example">"Agreed: Shopify for launch website. Sharp to set up by March 28."</div>
+          </div>
+          <div class="ct-card" onclick="fillTemplate('expense')">
+            <div class="ct-icon">฿</div>
+            <div class="ct-name">Expense Log</div>
+            <div class="ct-desc">Log a purchase or expense for the finance tracker.</div>
+            <div class="ct-example">"Paid 4,200 THB fabric samples to K.Malee, March 10"</div>
+          </div>
+          <div class="ct-card" onclick="fillTemplate('deadline')">
+            <div class="ct-icon">📅</div>
+            <div class="ct-name">Deadline / Task</div>
+            <div class="ct-desc">Add a task or deadline from a message and assign it to a founder.</div>
+            <div class="ct-example">"Pom to confirm production capacity by April 5 — critical for schedule"</div>
+          </div>
+          <div class="ct-card" onclick="fillTemplate('contact')">
+            <div class="ct-icon">👤</div>
+            <div class="ct-name">Supplier Contact</div>
+            <div class="ct-desc">Save a supplier or vendor contact with key details.</div>
+            <div class="ct-example">"K.Malee Textiles, 02-xxx-xxxx, specialises in silk blends, Pratunam"</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVED CAPTURES -->
+      <div class="saved-captures" id="saved-captures-section" style="display:none">
+        <div class="section-eyebrow" style="margin-bottom:11px">Recently Captured</div>
+        <div id="saved-captures-list"></div>
+      </div>
+
+    </div>
+  </div><!-- /pg-capture -->
+
+  <!-- ══════════════════════════════════════════════
+       COLLECTION TRACKER
+  ══════════════════════════════════════════════ -->
+  <div id="pg-col" class="page">
+    <div class="col-inner">
+
+      <!-- TOOLBAR -->
+      <div class="col-toolbar">
+        <div class="col-title-row">
+          <span class="col-h1">Collection · Capsule 01</span>
+          <span class="col-count" id="col-count-lbl"></span>
+        </div>
+        <div class="col-filter-row">
+          <button class="cf active" onclick="filterCol(this,'all')">All</button>
+          <button class="cf" onclick="filterCol(this,'blocked')">Blocked</button>
+          <button class="cf" onclick="filterCol(this,'sampling')">Sampling</button>
+          <button class="cf" onclick="filterCol(this,'production')">In production</button>
+          <button class="cf" onclick="filterCol(this,'done')">Done</button>
+        </div>
+        <button class="col-add-btn" onclick="openStyleModal(null)">+ Style</button>
+      </div>
+
+      <!-- DETAIL PANEL (expands on row click) -->
+      <div class="col-detail" id="col-detail">
+        <div class="cd-head">
+          <div class="cd-head-left">
+            <span class="cd-ms-num" id="cd-ms-num"></span>
+            <span class="cd-style-name" id="cd-style-name"></span>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center">
+            <button class="cd-btn" onclick="openStyleModal(currentColId)">Edit</button>
+            <button class="cd-close" onclick="closeColDetail()">Close ✕</button>
+          </div>
+        </div>
+        <div class="cd-body">
+          <!-- Meta fields — all inline editable -->
+          <div class="cd-grid">
+            <div class="cd-field">
+              <div class="cd-field-label">Factory <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-factory" contenteditable="true" onblur="saveColField('factory',this.innerText)"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Fabric / Yarn <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-fabric" contenteditable="true" onblur="saveColField('fabric',this.innerText)"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Colorway(s) <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-cw" contenteditable="true" onblur="saveColField('colorway',this.innerText)"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Owner(s)</div>
+              <div class="cd-field-val" id="cd-owners"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Due / Next date <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-due" contenteditable="true" onblur="saveColField('due',this.innerText)"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Size range <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-size" contenteditable="true" onblur="saveColField('size',this.innerText)"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Quantity (units) <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-qty" contenteditable="true" onblur="saveColField('qty',this.innerText)"></div>
+            </div>
+            <div class="cd-field">
+              <div class="cd-field-label">Est. unit cost (฿) <span class="edit-hint">click to edit</span></div>
+              <div class="cd-field-val editable" id="cd-cost" contenteditable="true" onblur="saveColField('cost',this.innerText)"></div>
+            </div>
+          </div>
+
+          <!-- Stage pipeline — click a step to advance -->
+          <div class="cd-stages-label">Production stage <span style="font-size:10px;color:#9E9E9E;font-style:italic;letter-spacing:0;text-transform:none;margin-left:6px">Click a stage to update</span></div>
+          <div class="cd-pipeline" id="cd-pipeline"></div>
+
+          <!-- Blocker -->
+          <div style="margin-bottom:12px">
+            <div class="cd-notes-label">Blocker <span style="font-size:9px;color:#D92D20;letter-spacing:0;text-transform:none">— leave blank if none</span></div>
+            <input type="text" class="sm-input" id="cd-blocker" placeholder="e.g. Design not confirmed, waiting on Guy" onblur="saveColField('blocker',this.value)" style="margin-bottom:0">
+          </div>
+
+          <!-- Notes -->
+          <div class="cd-notes-label">Notes <span style="font-size:9px;color:#9E9E9E;letter-spacing:0;text-transform:none">— fitting feedback, amendments, factory comms</span></div>
+          <textarea class="cd-notes" id="cd-notes" placeholder="Sample feedback, fitting comments, factory notes…" onblur="saveColField('notes',this.value)"></textarea>
+
+          <div class="cd-action-row">
+            <button class="cd-btn primary" onclick="advanceColStage()">Advance stage →</button>
+            <button class="cd-btn" onclick="sendPrompt('What needs to happen next for ' + getColStyleName() + '?')">What's next? ↗</button>
+            <button class="cd-btn" onclick="sendPrompt('Are there risks to the schedule for ' + getColStyleName() + '?')">Check risks ↗</button>
+            <button class="cd-btn danger" onclick="deleteColStyle()">Delete style</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="col-table-wrap">
+        <table class="col-table">
+          <thead>
+            <tr>
+              <th style="width:50px">MS #</th>
+              <th>Style name</th>
+              <th>Factory</th>
+              <th style="width:80px">Owner</th>
+              <th style="min-width:200px">Stage</th>
+              <th>Due</th>
+              <th>Blocker</th>
+            </tr>
+          </thead>
+          <tbody id="col-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- HOW TO EDIT GUIDE -->
+      <div class="howto-panel">
+        <div class="howto-head" onclick="toggleHowto()">
+          <span class="howto-title">How to edit this tracker</span>
+          <span style="font-size:11px;color:#9E9E9E" id="howto-toggle-lbl">Show ↓</span>
+        </div>
+        <div class="howto-body" id="howto-body">
+          <div class="hw-card">
+            <div class="hw-label">Add a new style</div>
+            <div class="hw-text">Click <span class="hw-code">+ Style</span> button top right. Fill in style name, factory, fabric, colorway, owners and starting stage.</div>
+          </div>
+          <div class="hw-card">
+            <div class="hw-label">Edit style details</div>
+            <div class="hw-text">Click any row to open the detail panel. Fields with <span class="hw-code">click to edit</span> are inline editable — just click and type. Changes save automatically when you click away.</div>
+          </div>
+          <div class="hw-card">
+            <div class="hw-label">Update production stage</div>
+            <div class="hw-text">In the detail panel, click any stage pill directly to jump to it. Or use <span class="hw-code">Advance stage →</span> to move to the next stage in sequence.</div>
+          </div>
+          <div class="hw-card">
+            <div class="hw-label">Log a blocker</div>
+            <div class="hw-text">Type in the Blocker field — it shows as a red tag in the table so the team can spot stuck styles instantly. Clear it when resolved.</div>
+          </div>
+          <div class="hw-card">
+            <div class="hw-label">Add fitting / sample notes</div>
+            <div class="hw-text">Use the Notes textarea at the bottom of the detail panel. Paste LINE messages, fitting feedback, or factory replies here. It saves on blur.</div>
+          </div>
+          <div class="hw-card">
+            <div class="hw-label">Change data in the JS</div>
+            <div class="hw-text">In the HTML file, find <span class="hw-code">STYLES_KEY</span> and <span class="hw-code">COL_SEED</span>. COL_SEED is the default data — edit the array to change styles, factories, fabrics, or starting stages.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /pg-col -->
+
+  <!-- STYLE MODAL -->
+  <div id="style-modal-bg">
+    <div id="style-modal">
+      <div class="sm-head">
+        <div class="sm-title" id="sm-title">New style</div>
+        <button class="sm-x" onclick="closeStyleModal()">✕</button>
+      </div>
+      <div class="sm-row">
+        <div>
+          <label class="sm-lbl">MS number</label>
+          <input class="sm-input" id="sm-ms" placeholder="e.g. PRPH-008">
+        </div>
+        <div>
+          <label class="sm-lbl">Style name</label>
+          <input class="sm-input" id="sm-name" placeholder="e.g. Knitted Polo Top">
+        </div>
+      </div>
+      <label class="sm-lbl">Factory / Machinist</label>
+      <div class="sm-opts" id="sm-factory-opts">
+        <button class="sm-opt" onclick="toggleSmOpt(this,'factory')">MFG (Knit)</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'factory')">Jean &amp; Jane (Denim)</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'factory')">K.Tuan</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'factory')">K.Bank</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'factory')">K.Pao</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'factory')">TBC</button>
+      </div>
+      <label class="sm-lbl">Fabric / Yarn</label>
+      <input class="sm-input" id="sm-fabric" placeholder="e.g. 65% Viscose 35% Nylon, Denim, Crêpe…">
+      <label class="sm-lbl">Colorway(s)</label>
+      <input class="sm-input" id="sm-cw" placeholder="e.g. Red / Black, Ivory / Navy">
+      <label class="sm-lbl">Owner(s)</label>
+      <div class="sm-opts" id="sm-owner-opts">
+        <button class="sm-opt" onclick="toggleSmOpt(this,'owner')">Guy</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'owner')">Pom</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'owner')">Sharp</button>
+      </div>
+      <label class="sm-lbl">Starting stage</label>
+      <div class="sm-opts" id="sm-stage-opts">
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">0 — Concept</button>
+        <button class="sm-opt selected" onclick="toggleSmOpt(this,'stage')">1 — Toile</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">2 — 1st Fitting</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">3 — Sampling</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">4 — 2nd Fitting</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">5 — Production</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">6 — QC</button>
+        <button class="sm-opt" onclick="toggleSmOpt(this,'stage')">7 — Done</button>
+      </div>
+      <label class="sm-lbl">Due date</label>
+      <input class="sm-input" id="sm-due" placeholder="e.g. 17 Mar, April 27">
+      <label class="sm-lbl">Notes</label>
+      <textarea class="sm-input" id="sm-notes" rows="2" placeholder="Any initial notes…" style="resize:vertical"></textarea>
+      <div class="sm-ftr">
+        <button class="cd-btn danger" id="sm-del-btn" style="display:none" onclick="deleteColStyle()">Delete</button>
+        <div style="display:flex;gap:7px;margin-left:auto">
+          <button class="cd-btn" onclick="closeStyleModal()">Cancel</button>
+          <button class="cd-btn primary" onclick="saveStyleModal()">Save style</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       CALENDAR PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-cal" class="page">
+    <div id="cal-main">
+      <div id="cal-top">
+        <div style="display:flex;align-items:center;gap:7px">
+          <button class="arr" onclick="prevMonth()">‹</button>
+          <div id="mnth-lbl"></div>
+          <button class="arr" onclick="nextMonth()">›</button>
+        </div>
+        <div id="view-sw">
+          <button class="vtab active" onclick="setView('month')">Month</button>
+          <button class="vtab" onclick="setView('list')">List</button>
+          <button class="vtab" onclick="setView('milestones')">Launch</button>
+        </div>
+        <div id="cat-bar"></div>
+      </div>
+      <div id="cal-content"></div>
+    </div>
+    <div id="cal-sb">
+      <div id="cstabs">
+        <button class="cstab active" onclick="setCSTab('reminders')">Alerts</button>
+        <button class="cstab" onclick="setCSTab('suggest')">AI</button>
+        <button class="cstab" onclick="setCSTab('upcoming')">Upcoming</button>
+        <button class="cstab" onclick="setCSTab('team')">Team</button>
+      </div>
+      <div id="cspanel"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       FINANCE PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-fin" class="page">
+    <div class="fin-inner">
+      <div class="fin-hero">
+        <div class="fh-stat">
+          <div class="fh-lbl">Founder Equity</div>
+          <div class="fh-val v-sage">฿150,000</div>
+          <div class="fh-note">฿50,000 × 3 founders</div>
+        </div>
+        <div class="fh-stat">
+          <div class="fh-lbl">Total Spent</div>
+          <div class="fh-val v-rose">฿154,682</div>
+          <div class="fh-note">Through Feb 2026</div>
+        </div>
+        <div class="fh-stat">
+          <div class="fh-lbl">Net Position</div>
+          <div class="fh-val v-amber">−฿4,682</div>
+          <div class="fh-note">Top-up required</div>
+        </div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-head">Cash Position</div>
+        <div class="fsec-body">
+          <table class="ftable">
+            <tr><th>Item</th><th>Amount (THB)</th><th>Notes</th></tr>
+            <tr><td>Founder Equity (×3)</td><td class="p">+150,000</td><td>฿50,000 per founder</td></tr>
+            <tr><td>Expenses to Date</td><td class="n">−154,682</td><td>Through Feb 2026</td></tr>
+            <tr><td><strong>Net Cash Position</strong></td><td class="n"><strong>−4,682</strong></td><td>As of Feb 2026</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-head">Owner Equity Register</div>
+        <div class="fsec-body">
+          <table class="ftable">
+            <tr><th>Founder</th><th>Role</th><th>Equity (THB)</th><th>Status</th></tr>
+            <tr><td>Sharp</td><td>Finance & Operations</td><td class="p">50,000</td><td><span class="tag" style="background:#f0fdf4;color:#16a34a">Active</span></td></tr>
+            <tr><td>Guy</td><td>Creative Director</td><td class="p">50,000</td><td><span class="tag" style="background:#f0fdf4;color:#16a34a">Active</span></td></tr>
+            <tr><td>Pom</td><td>Production Lead</td><td class="p">50,000</td><td><span class="tag" style="background:#f0fdf4;color:#16a34a">Active</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-head">Connect Finance Spreadsheet</div>
+        <div class="fsec-body">
+          <div class="upload-zone" onclick="document.getElementById('excel-upload').click()">
+            <div style="font-size:26px">📊</div>
+            <p>Upload Prophecy_Excel_Master_v2.xlsx<br><span style="font-size:10.5px;color:var(--ghost)">Drag & drop or click · Finance data syncs automatically</span></p>
+            <input type="file" id="excel-upload" accept=".xlsx,.xls" style="display:none" onchange="handleExcelUpload(this)">
+          </div>
+          <div id="excel-data" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       CONNECTIONS PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-connect" class="page">
+    <div class="connect-inner">
+      <div class="connect-intro">
+        <div class="connect-title">Connections</div>
+        <div class="connect-sub">Link Prophecy HQ to the tools you already use. Connect once — data flows automatically. No more copying between apps.</div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="conn-status-bar">
+        <span class="csb-lbl">Connected</span>
+        <span class="csb-chip on" id="csc-sheets">✓ Google Sheets</span>
+        <span class="csb-chip off" id="csc-gcal">○ Google Calendar</span>
+        <span class="csb-chip off" id="csc-gmail">○ Gmail</span>
+        <span class="csb-chip off" id="csc-drive">○ Google Drive</span>
+        <span class="csb-chip off" id="csc-line">○ LINE Notify</span>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="how-section" style="margin-bottom:22px">
+        <div class="how-title">How connections work</div>
+        <div class="how-steps">
+          <div class="how-step">
+            <div class="hs-num">1</div>
+            <div class="hs-title">Connect</div>
+            <div class="hs-desc">Paste a URL, ID, or token for each tool below</div>
+          </div>
+          <div class="how-step">
+            <div class="hs-num">2</div>
+            <div class="hs-title">Sync</div>
+            <div class="hs-desc">Data flows in automatically — events, emails, files</div>
+          </div>
+          <div class="how-step">
+            <div class="hs-num">3</div>
+            <div class="hs-title">Capture</div>
+            <div class="hs-desc">Use Quick Capture to push structured data back out</div>
+          </div>
+          <div class="how-step">
+            <div class="hs-num">4</div>
+            <div class="hs-title">See everything</div>
+            <div class="hs-desc">One view. All your tools. Nothing missed.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOOGLE WORKSPACE -->
+      <div class="conn-group-title">Google Workspace</div>
+      <div class="conn-grid">
+
+        <!-- SHEETS -->
+        <div class="conn-card ic-connected" id="ic-sheets">
+          <div class="cc-top">
+            <div class="cc-left">
+              <div class="cc-icon" style="background:rgba(58,122,92,.08)">📊</div>
+              <div>
+                <div class="cc-name">Google Sheets</div>
+                <div class="cc-tagline">Events & finance tracker</div>
+              </div>
+            </div>
+            <span class="cc-status connected" id="sheets-status">Connected</span>
+          </div>
+          <div class="cc-desc">Your master tracker. Events sync bi-directionally — add here, see in Sheets, and vice versa. Your Apps Script URL is the bridge.</div>
+          <div class="cc-feats">
+            <span class="cc-feat">✓ Events sync</span>
+            <span class="cc-feat">✓ Real-time push</span>
+            <span class="cc-feat">✓ Offline fallback</span>
+          </div>
+          <div class="cc-action">
+            <input class="cc-input" id="sheets-url-input" placeholder="Apps Script URL (already set)">
+            <button class="cc-save" onclick="saveIntegration('sheets')">Update</button>
+          </div>
+        </div>
+
+        <!-- GOOGLE CALENDAR -->
+        <div class="conn-card" id="ic-gcal">
+          <div class="cc-top">
+            <div class="cc-left">
+              <div class="cc-icon" style="background:rgba(58,96,138,.08)">📅</div>
+              <div>
+                <div class="cc-name">Google Calendar</div>
+                <div class="cc-tagline">Two-way calendar sync</div>
+              </div>
+            </div>
+            <span class="cc-status setup" id="gcal-status">Setup needed</span>
+          </div>
+          <div class="cc-desc">Export all Prophecy events to a Google Calendar file (.ics) and import it into your Google Calendar. Or paste your Calendar ID to enable live sync via Apps Script.</div>
+          <div class="cc-feats">
+            <span class="cc-feat">Export .ics file</span>
+            <span class="cc-feat">Import to Google Calendar</span>
+            <span class="cc-feat">Milestone alerts</span>
+          </div>
+          <div class="cc-action" style="flex-wrap:wrap;gap:6px">
+            <button class="cc-btn" onclick="exportToGCal()">⬇ Export .ics file</button>
+            <button class="cc-btn" onclick="toggleGCalInstructions()">How to import →</button>
+          </div>
+          <div class="cc-instructions" id="gcal-instructions">
+            <ol>
+              <li>Click <strong>Export .ics file</strong> above to download <code>prophecy-events.ics</code></li>
+              <li>Open <a href="https://calendar.google.com" target="_blank" style="color:var(--slate)">Google Calendar</a> → Settings (⚙) → Import & Export</li>
+              <li>Click <strong>Import</strong> and select the downloaded file</li>
+              <li>All Prophecy events and milestones will appear in your calendar</li>
+              <li><strong>Re-export</strong> whenever you add new events here</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- GMAIL -->
+        <div class="conn-card" id="ic-gmail">
+          <div class="cc-top">
+            <div class="cc-left">
+              <div class="cc-icon" style="background:rgba(176,64,96,.07)">✉</div>
+              <div>
+                <div class="cc-name">Gmail</div>
+                <div class="cc-tagline">Vendor email digest</div>
+              </div>
+            </div>
+            <span class="cc-status not" id="gmail-status">Not connected</span>
+          </div>
+          <div class="cc-desc">Forward vendor, supplier, and partner emails to a dedicated Prophecy address. They'll surface here categorised by domain — production, finance, legal.</div>
+          <div class="cc-feats">
+            <span class="cc-feat">Vendor email log</span>
+            <span class="cc-feat">Auto-categorised</span>
+            <span class="cc-feat">Searchable</span>
+          </div>
+          <div class="cc-action">
+            <input class="cc-input" id="gmail-url-input" placeholder="Your Gmail address (for forwarding setup)">
+            <button class="cc-save" onclick="saveIntegration('gmail')">Save</button>
+          </div>
+        </div>
+
+        <!-- GOOGLE DRIVE -->
+        <div class="conn-card" id="ic-gdrive">
+          <div class="cc-top">
+            <div class="cc-left">
+              <div class="cc-icon" style="background:rgba(184,150,90,.08)">🗂</div>
+              <div>
+                <div class="cc-name">Google Drive</div>
+                <div class="cc-tagline">Files in context</div>
+              </div>
+            </div>
+            <span class="cc-status not" id="gdrive-status">Not connected</span>
+          </div>
+          <div class="cc-desc">Link your Prophecy Drive folder. Files will appear in the right context — collection docs with production, finance files with Finance, brand assets with Design.</div>
+          <div class="cc-feats">
+            <span class="cc-feat">Browse by domain</span>
+            <span class="cc-feat">Quick file access</span>
+            <span class="cc-feat">Canva link</span>
+          </div>
+          <div class="cc-action">
+            <input class="cc-input" id="gdrive-url-input" placeholder="Google Drive folder URL or ID">
+            <button class="cc-save" onclick="saveIntegration('gdrive')">Save</button>
+          </div>
+        </div>
+
+      </div><!-- /google grid -->
+
+      <!-- MESSAGING & NOTIFICATIONS -->
+      <div class="conn-group-title">Messaging & Notifications</div>
+      <div class="conn-grid">
+
+        <!-- LINE NOTIFY -->
+        <div class="conn-card" id="ic-line">
+          <div class="cc-top">
+            <div class="cc-left">
+              <div class="cc-icon" style="background:rgba(58,122,92,.08)">💬</div>
+              <div>
+                <div class="cc-name">LINE Notify</div>
+                <div class="cc-tagline">Daily briefings to team chat</div>
+              </div>
+            </div>
+            <span class="cc-status not" id="line-status">Not connected</span>
+          </div>
+          <div class="cc-desc">Get daily AI briefings and milestone alerts sent to your LINE group. Uses LINE Notify — free, no bot needed, just a webhook token.</div>
+          <div class="cc-feats">
+            <span class="cc-feat">Daily AI briefing</span>
+            <span class="cc-feat">Milestone alerts</span>
+            <span class="cc-feat">Overdue task pings</span>
+          </div>
+          <div class="cc-action" style="flex-wrap:wrap;gap:6px">
+            <input class="cc-input" id="line-url-input" placeholder="LINE Notify token">
+            <button class="cc-save" onclick="saveIntegration('line')">Connect</button>
+          </div>
+          <div style="margin-top:8px;font-size:10.5px;color:var(--muted)">Get a token at <a href="https://notify-bot.line.me" target="_blank" style="color:var(--slate)">notify-bot.line.me</a> → My page → Generate token</div>
+        </div>
+
+        <!-- APPS SCRIPT WEBHOOK -->
+        <div class="conn-card" id="ic-webhook">
+          <div class="cc-top">
+            <div class="cc-left">
+              <div class="cc-icon" style="background:rgba(124,92,154,.08)">⚡</div>
+              <div>
+                <div class="cc-name">Apps Script Webhook</div>
+                <div class="cc-tagline">Receive data from anywhere</div>
+              </div>
+            </div>
+            <span class="cc-status setup" id="webhook-status">Active</span>
+          </div>
+          <div class="cc-desc">Your Apps Script URL accepts POST requests from any tool — Zapier, Make, email forwarders, or custom scripts. Send structured JSON and it lands in your Sheets.</div>
+          <div class="cc-feats">
+            <span class="cc-feat">Accept any POST</span>
+            <span class="cc-feat">Auto-routes to Sheets</span>
+            <span class="cc-feat">Works with Zapier</span>
+          </div>
+          <div style="margin-top:4px">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;letter-spacing:.06em">YOUR WEBHOOK URL</div>
+            <div style="display:flex;gap:7px">
+              <div style="flex:1;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:7px 10px;font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="webhook-url-display">Loading…</div>
+              <button class="cc-btn" onclick="copyWebhookUrl()">Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /messaging grid -->
+
+      <!-- APPS SCRIPT CODE -->
+      <div class="conn-group-title" style="margin-top:4px">Extend Your Apps Script</div>
+      <div class="conn-card" style="margin-bottom:24px">
+        <div class="cc-top" style="margin-bottom:10px">
+          <div class="cc-left">
+            <div class="cc-icon" style="background:rgba(58,96,138,.08)">⌨</div>
+            <div>
+              <div class="cc-name">Add LINE Notify to Your Apps Script</div>
+              <div class="cc-tagline">Paste this code into your existing Code.gs to enable notifications</div>
+            </div>
+          </div>
+          <a href="https://script.google.com/home/projects/1xctRKnsNQs5m3sby2JrMXEbm7C25R1gG0Z1zkEMrkQg0pOErzkGF1tuQ/edit" target="_blank" style="font-size:10.5px;font-weight:600;color:var(--slate);white-space:nowrap">Open Apps Script →</a>
+        </div>
+        <div style="background:#0D0B10;border-radius:5px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#a8c8a8;line-height:1.7;overflow-x:auto">
+<span style="color:#7C9ABE">// Add to Code.gs — LINE Notify integration</span><br>
+<span style="color:#B8965A">function</span> <span style="color:#D4B070">sendLineNotify</span>(message) {<br>
+&nbsp;&nbsp;<span style="color:#7C9ABE">const</span> token = PropertiesService.getScriptProperties()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.getProperty(<span style="color:#8A9B6E">'LINE_TOKEN'</span>);<br>
+&nbsp;&nbsp;<span style="color:#7C9ABE">if</span> (!token) <span style="color:#7C9ABE">return</span>;<br>
+&nbsp;&nbsp;UrlFetchApp.fetch(<span style="color:#8A9B6E">'https://notify-api.line.me/api/notify'</span>, {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;method: <span style="color:#8A9B6E">'post'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;headers: { Authorization: <span style="color:#8A9B6E">'Bearer '</span> + token },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;payload: { message: message }<br>
+&nbsp;&nbsp;});<br>
+}<br>
+<br>
+<span style="color:#7C9ABE">// Call this from a daily trigger:</span><br>
+<span style="color:#B8965A">function</span> <span style="color:#D4B070">dailyBriefing</span>() {<br>
+&nbsp;&nbsp;<span style="color:#7C9ABE">const</span> daysLeft = getDaysToLaunch();<br>
+&nbsp;&nbsp;sendLineNotify(<span style="color:#8A9B6E">`☽ PROPHECY — ${daysLeft}d to launch\n`</span> +<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8A9B6E">`Today: ${getTodayEvents()}`</span>);<br>
+}
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button class="cc-btn" onclick="copyLineCode()">Copy code</button>
+          <a href="https://script.google.com/home/projects/1xctRKnsNQs5m3sby2JrMXEbm7C25R1gG0Z1zkEMrkQg0pOErzkGF1tuQ/edit" target="_blank"><button class="cc-btn">Open in Apps Script</button></a>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /pg-connect -->
+
+</div><!-- /main -->
+
+  <!-- ══════════════════════════════════════════════
+       WORK TRACKER PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-work" class="page">
+    <div class="work-inner">
+
+      <div class="work-header">
+        <div>
+          <div class="work-title">Work Tracker</div>
+          <div class="work-sub">Tasks, responsibilities, and ownership across the team. Each founder's lane — what's open, what's due, what's done.</div>
+        </div>
+        <div class="work-header-right">
+          <button class="wh-btn" onclick="filterWorkView('all')" id="wf-all">All</button>
+          <button class="wh-btn" onclick="filterWorkView('open')" id="wf-open">Open</button>
+          <button class="wh-btn" onclick="filterWorkView('overdue')" id="wf-overdue">Overdue</button>
+          <button class="wh-btn primary" onclick="openTaskModal(null,null)">+ Task</button>
+        </div>
+      </div>
+
+      <!-- RESPONSIBILITY MATRIX -->
+      <div class="resp-matrix">
+        <div class="rm-head">
+          <span class="rm-title">Responsibility Matrix</span>
+          <span style="font-size:10px;color:var(--ghost)">● Lead &nbsp; ◑ Support &nbsp; ◎ Review</span>
+        </div>
+        <table class="rm-table">
+          <thead>
+            <tr>
+              <th style="width:180px">Domain</th>
+              <th>Key Responsibilities</th>
+              <th class="founder-th" style="color:#7C5C9A">Sharp</th>
+              <th class="founder-th" style="color:#B04060">Guy</th>
+              <th class="founder-th" style="color:#3A7A5C">Pom</th>
+            </tr>
+          </thead>
+          <tbody id="resp-matrix-body"></tbody>
+        </table>
+      </div>
+
+      <!-- FOUNDER TASK COLUMNS -->
+      <div class="section-eyebrow" style="margin-bottom:13px">Task Lanes</div>
+      <div class="work-cols" id="work-cols"></div>
+
+    </div>
+  </div>
+
+  <!-- TASK MODAL -->
+  <div id="task-modal-bg">
+    <div id="task-modal">
+      <div class="tm-hdr">
+        <div class="tm-title" id="tm-title">New Task</div>
+        <button class="tm-x" onclick="closeTaskModal()">✕</button>
+      </div>
+      <label class="m-lbl">Task title</label>
+      <input class="m-input" id="tm-name" placeholder="What needs doing?">
+      <div class="m-row" style="margin-top:0">
+        <div><label class="m-lbl">Due date</label><input type="date" class="m-input" id="tm-due"></div>
+        <div><label class="m-lbl">Priority</label>
+          <select class="m-input" id="tm-pri">
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <label class="m-lbl">Owner</label>
+      <div style="display:flex;gap:6px" id="tm-owner-opts"></div>
+      <label class="m-lbl">Domain</label>
+      <div class="cat-opts" id="tm-cat-opts"></div>
+      <label class="m-lbl">Notes</label>
+      <textarea class="m-input" id="tm-notes" rows="2" placeholder="Any details…"></textarea>
+      <div class="m-ftr">
+        <button class="m-del" id="tm-del-btn" style="display:none" onclick="deleteTask()">Delete</button>
+        <div style="display:flex;gap:7px">
+          <button class="m-cancel" onclick="closeTaskModal()">Cancel</button>
+          <button class="m-save" onclick="saveTask()">Save Task</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       GANTT CHART PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-gantt" class="page">
+    <div class="gantt-toolbar">
+      <span class="gantt-title">Company Timeline · Oct 2025 → Jul 2026</span>
+      <button class="gz-btn active" onclick="setGanttZoom('full')" id="gz-full">Full Range</button>
+      <button class="gz-btn" onclick="setGanttZoom('near')" id="gz-near">Now → Launch</button>
+      <button class="gz-btn" onclick="renderGantt()" title="Refresh">↺ Refresh</button>
+    </div>
+    <div class="gantt-wrap" id="gantt-wrap">
+      <div class="gantt-container" id="gantt-container"></div>
+    </div>
+    <div class="gantt-legend">
+      <span class="gl-item"><span class="gl-swatch" style="background:#B04060"></span>Production</span>
+      <span class="gl-item"><span class="gl-swatch" style="background:#7C5C9A"></span>Design</span>
+      <span class="gl-item"><span class="gl-swatch" style="background:#B8965A"></span>Brand &amp; Mktg</span>
+      <span class="gl-item"><span class="gl-swatch" style="background:#3A7A5C"></span>Finance</span>
+      <span class="gl-item"><span class="gl-swatch" style="background:#3A608A"></span>Website</span>
+      <span class="gl-item"><span class="gl-swatch" style="background:#5A8CA0"></span>Operations</span>
+      <span class="gl-item"><span class="gl-today"></span>Today</span>
+      <span class="gl-item"><span class="gl-milestone"></span>Milestone</span>
+    </div>
+  </div>
+
+<!-- SYNC DRAWER -->
+<div id="sync-drawer">
+  <span class="sd-lbl">⚡ Google Sheets Sync</span>
+  <input id="sd-input" placeholder="Apps Script URL…">
+  <button class="sd-save" onclick="saveSyncUrl()">Connect</button>
+  <button class="sd-x" onclick="toggleSyncDrawer()">✕</button>
+</div>
+
+<!-- EVENT MODAL -->
+<div id="modal-bg">
+  <div id="modal">
+    <div class="m-hdr">
+      <div class="m-title" id="m-title-lbl">New Event</div>
+      <button class="m-x" onclick="closeModal()">✕</button>
+    </div>
+    <label class="m-lbl">Title</label>
+    <input class="m-input" id="m-title" placeholder="e.g. First sample review">
+    <div class="m-row">
+      <div><label class="m-lbl">Date</label><input type="date" class="m-input" id="m-date"></div>
+      <div><label class="m-lbl">Time</label><input type="time" class="m-input" id="m-time"></div>
+    </div>
+    <label class="m-lbl">Category</label>
+    <div class="cat-opts" id="m-cat-opts"></div>
+    <label class="m-lbl">Owners</label>
+    <div class="own-opts" id="m-own-opts"></div>
+    <label class="m-lbl">Priority</label>
+    <div class="pri-opts" id="m-pri-opts"></div>
+    <label class="m-lbl">Notes</label>
+    <textarea class="m-input" id="m-notes" rows="2" placeholder="Details…"></textarea>
+    <div class="m-ftr">
+      <button class="m-del" id="m-del-btn" style="display:none" onclick="deleteEvent()">Delete</button>
+      <div style="display:flex;gap:7px">
+        <button class="m-cancel" onclick="closeModal()">Cancel</button>
+        <button class="m-save" onclick="saveEvent()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────
+const SYNC_URL_KEY='prophecy_sync_url';
+const EVENTS_KEY='prophecy_events_v3';
+const INTEG_KEY='prophecy_integrations';
+const CAPTURES_KEY='prophecy_captures';
+const LAUNCH_DATE=new Date('2026-07-01');
+
+const FOUNDERS=[
+  {id:'sharp',name:'Sharp',color:'#7C5C9A',bg:'rgba(124,92,154,.12)',border:'rgba(124,92,154,.4)'},
+  {id:'guy',  name:'Guy',  color:'#B04060',bg:'rgba(176,64,96,.12)', border:'rgba(176,64,96,.4)'},
+  {id:'pom',  name:'Pom',  color:'#3A7A5C',bg:'rgba(58,122,92,.12)',border:'rgba(58,122,92,.4)'},
+];
+const CATEGORIES=[
+  {id:'collection',label:'Collection',color:'#7C5C9A',bg:'rgba(124,92,154,.1)'},
+  {id:'production', label:'Production',color:'#B04060',bg:'rgba(176,64,96,.1)'},
+  {id:'website',    label:'Website',   color:'#3A608A',bg:'rgba(58,96,138,.1)'},
+  {id:'finance',    label:'Finance',   color:'#3A7A5C',bg:'rgba(58,122,92,.1)'},
+  {id:'brand',      label:'Brand & Mktg',color:'#B8965A',bg:'rgba(184,150,90,.1)'},
+  {id:'operations', label:'Operations',color:'#5A8CA0',bg:'rgba(90,140,160,.1)'},
+  {id:'strategy',   label:'Strategy',  color:'#7C5C9A',bg:'rgba(124,92,154,.1)'},
+];
+const MILESTONES=[
+  {id:'ms1',title:'Final Fabric Sourced',     date:'2026-04-15',color:'#7C5C9A'},
+  {id:'ms2',title:'Patterns Finalised',        date:'2026-04-30',color:'#B04060'},
+  {id:'ms3',title:'Production Handoff',        date:'2026-05-15',color:'#3A608A'},
+  {id:'ms4',title:'Website Live (Staging)',    date:'2026-05-31',color:'#3A7A5C'},
+  {id:'ms5',title:'Photography & Content Done',date:'2026-06-10',color:'#B8965A'},
+  {id:'ms6',title:'🚀 LAUNCH — PROPHECY',      date:'2026-07-01',color:'#B8965A'},
+];
+const SEED_EVENTS=[
+  {id:'se1',title:'Founder Weekly Sync',date:'2026-03-10',time:'10:00',category:'strategy',owners:['sharp','guy','pom'],priority:'high',notes:'Review weekly priorities and blockers',recurring:'weekly'},
+  {id:'se2',title:'Q1 Finance Review',date:'2026-03-12',time:'14:00',category:'finance',owners:['sharp'],priority:'high',notes:'Review cash position and project burn rate',recurring:''},
+  {id:'se3',title:'First Sample Review',date:'2026-03-15',time:'11:00',category:'collection',owners:['guy','pom'],priority:'critical',notes:'Evaluate first real-fabric samples.',recurring:''},
+  {id:'se4',title:'Website Platform Decision',date:'2026-03-20',time:'15:00',category:'website',owners:['sharp','guy'],priority:'high',notes:'Decide: Shopify vs custom.',recurring:''},
+  {id:'se5',title:'Fabric Sourcing Trip',date:'2026-04-01',time:'',category:'production',owners:['pom','guy'],priority:'critical',notes:'Bangkok fabric market. Final selections.',recurring:''},
+  {id:'se6',title:'Lookbook Concept Review',date:'2026-04-10',time:'13:00',category:'brand',owners:['guy'],priority:'medium',notes:'Creative direction and photographer shortlist.',recurring:''},
+  {id:'se7',title:'Production Partner Meeting',date:'2026-05-01',time:'10:00',category:'production',owners:['pom'],priority:'critical',notes:'Confirm production partners and capacity.',recurring:''},
+  {id:'se8',title:'Marketing Launch Plan',date:'2026-06-01',time:'14:00',category:'brand',owners:['sharp','guy'],priority:'high',notes:'Finalise launch marketing calendar and budget.',recurring:''},
+];
+
+// ─── STATE ───────────────────────────────────────────────
+let events=[],syncUrl='',syncState='offline';
+let currentMonth=new Date(),currentView='month';
+let activeCats=new Set(),activeFounder='all',activeCSTab='reminders';
+let editingId=null,mCat='collection',mOwners=['sharp','guy','pom'],mPri='medium';
+let suggestMode='week',suggestLoading=false;
+let integrations={};
+let captures=[];
+let capMode='auto',capLoading=false;
+let pendingCaptures=[];
+
+// ─── INIT ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',async()=>{
+  const saved=localStorage.getItem(EVENTS_KEY);
+  events=saved?JSON.parse(saved):[...SEED_EVENTS];
+  syncUrl=localStorage.getItem(SYNC_URL_KEY)||'';
+  integrations=JSON.parse(localStorage.getItem(INTEG_KEY)||'{}');
+  captures=JSON.parse(localStorage.getItem(CAPTURES_KEY)||'[]');
+
+  const BAKED='https://script.google.com/macros/s/AKfycbwFxgEkiZ5gDttpLHX1W1UtXSgUcTp36qMAnwi-0qNtP9EKIA2uK3YRQ9vT59Z-mh3r/exec';
+  if(!syncUrl&&BAKED){syncUrl=BAKED;localStorage.setItem(SYNC_URL_KEY,syncUrl);}
+
+  updateCountdown();setInterval(updateCountdown,60000);
+  buildFounderPills();buildCatBar();buildModalOptions();buildTaskModalOptions();setDefaultDate();
+  loadTasks();updateWorkBadge();
+  loadColStyles();updateColBadge();
+  renderAll();renderConnections();renderSavedCaptures();
+  updateCapBadge();
+  document.getElementById('webhook-url-display').textContent=syncUrl||'Set up your Apps Script URL first';
+
+  if(syncUrl){
+    document.getElementById('sd-input').value=syncUrl;
+    document.getElementById('sheets-url-input').value=syncUrl;
+    await doSync();
+  }
+  loadInsight(false);
+});
+
+// ─── SYNC ────────────────────────────────────────────────
+async function doSync(){
+  if(!syncUrl)return;
+  setSyncState('syncing');
+  try{
+    const r=await fetch(`${syncUrl}?action=read&t=${Date.now()}`);
+    const d=await r.json();
+    if(d.events&&d.events.length>0){
+      const remoteIds=new Set(d.events.map(e=>e.id));
+      const localOnly=events.filter(e=>!remoteIds.has(e.id));
+      events=[...d.events.map(normalizeEvent),...localOnly];
+      saveLocal();
+    }else{await pushAll();}
+    setSyncState('live');renderAll();
+    toast('Synced with Google Sheets ✓');
+  }catch(e){setSyncState('offline');toast('Sync failed — working offline');}
+}
+async function pushEvent(ev){if(!syncUrl)return;try{await fetch(syncUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',event:serializeEvent(ev)})});}catch(e){}}
+async function pushDelete(id){if(!syncUrl)return;try{await fetch(syncUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',id})});}catch(e){}}
+async function pushAll(){if(!syncUrl)return;try{await fetch(syncUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'saveAll',events:events.map(serializeEvent)})});}catch(e){}}
+function serializeEvent(ev){return{...ev,owners:Array.isArray(ev.owners)?ev.owners.join(','):ev.owners};}
+function normalizeEvent(ev){if(typeof ev.owners==='string')ev.owners=ev.owners.split(',').filter(Boolean);return ev;}
+function setSyncState(s){
+  syncState=s;
+  const btn=document.getElementById('sb-sync-btn'),txt=document.getElementById('sb-sync-txt');
+  if(!btn)return;
+  btn.className='sb-sync-row '+s;
+  txt.textContent=s==='live'?'Live sync':s==='syncing'?'Syncing…':'Not synced';
+  const el=document.getElementById('sheets-status');
+  if(el){el.textContent=s==='live'?'Connected':s==='syncing'?'Syncing…':'Error';el.className='cc-status '+(s==='live'?'connected':'setup');}
+}
+function saveSyncUrl(){const v=document.getElementById('sd-input').value.trim();if(!v)return;syncUrl=v;localStorage.setItem(SYNC_URL_KEY,syncUrl);toggleSyncDrawer();doSync();}
+function toggleSyncDrawer(){const d=document.getElementById('sync-drawer');d.classList.toggle('open');if(d.classList.contains('open'))document.getElementById('sd-input').value=syncUrl;}
+function saveLocal(){localStorage.setItem(EVENTS_KEY,JSON.stringify(events));}
+
+// ─── INTEGRATIONS ────────────────────────────────────────
+function saveIntegration(type){
+  const input=document.getElementById(`${type}-url-input`);if(!input)return;
+  const val=input.value.trim();if(!val)return;
+  integrations[type]=val;
+  localStorage.setItem(INTEG_KEY,JSON.stringify(integrations));
+  if(type==='sheets'){syncUrl=val;localStorage.setItem(SYNC_URL_KEY,val);doSync();}
+  const statusEl=document.getElementById(`${type}-status`);
+  if(statusEl){statusEl.textContent='Connected';statusEl.className='cc-status connected';}
+  const card=document.getElementById(`ic-${type}`);
+  if(card)card.style.borderColor='rgba(58,122,92,.25)';
+  updateConnStatusBar();
+  toast(`${type} connected ✓`);
+}
+function updateConnStatusBar(){
+  const map={sheets:'csc-sheets',gcal:'csc-gcal',gmail:'csc-gmail',gdrive:'csc-drive',line:'csc-line'};
+  let count=syncUrl?1:0;
+  Object.entries(map).forEach(([k,elId])=>{
+    const on=(k==='sheets'&&syncUrl)||integrations[k];
+    const el=document.getElementById(elId);if(!el)return;
+    el.className='csb-chip '+(on?'on':'off');
+    el.textContent=(on?'✓ ':'○ ')+el.textContent.replace(/^[✓○] /,'');
+    if(on)count++;
+  });
+  document.getElementById('conn-badge').textContent=count;
+}
+function renderConnections(){
+  ['sheets','gcal','gmail','gdrive','line','zapier'].forEach(k=>{
+    const el=document.getElementById(`${k}-url-input`);
+    if(el&&integrations[k])el.value=integrations[k];
+  });
+  if(syncUrl)document.getElementById('sheets-url-input').value=syncUrl;
+  updateConnStatusBar();
+}
+function toggleGCalInstructions(){
+  const el=document.getElementById('gcal-instructions');
+  el.style.display=el.style.display==='block'?'none':'block';
+}
+function exportToGCal(){
+  const now=new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  let ics=`BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PROPHECY HQ//EN\r\nCALNAME:PROPHECY\r\n`;
+  events.forEach(ev=>{
+    const dt=ev.date.replace(/-/g,'');
+    const dtstart=ev.time?`${dt}T${ev.time.replace(':','')}00`:dt;
+    ics+=`BEGIN:VEVENT\r\nUID:${ev.id}@prophecy\r\nSUMMARY:${ev.title}${ev.priority==='critical'?' 🔴':ev.priority==='high'?' 🟡':''}\r\n`;
+    ics+=ev.time?`DTSTART:${dtstart}\r\n`:`DTSTART;VALUE=DATE:${dtstart}\r\n`;
+    if(ev.notes)ics+=`DESCRIPTION:${ev.notes.replace(/\n/g,'\\n')}\r\n`;
+    if(ev.owners)ics+=`CATEGORIES:${ev.owners.join(',')}\r\n`;
+    ics+=`END:VEVENT\r\n`;
+  });
+  MILESTONES.forEach(m=>{
+    const dt=m.date.replace(/-/g,'');
+    ics+=`BEGIN:VEVENT\r\nUID:${m.id}@prophecy-ms\r\nSUMMARY:⬥ MILESTONE: ${m.title}\r\nDTSTART;VALUE=DATE:${dt}\r\nEND:VEVENT\r\n`;
+  });
+  ics+=`END:VCALENDAR`;
+  const blob=new Blob([ics],{type:'text/calendar'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='prophecy-events.ics';a.click();
+  toast('Calendar file downloaded — import into Google Calendar');
+  integrations['gcal']='exported';
+  localStorage.setItem(INTEG_KEY,JSON.stringify(integrations));
+  const gs=document.getElementById('gcal-status');if(gs){gs.textContent='Exported';gs.className='cc-status connected';}
+  updateConnStatusBar();
+}
+function copyWebhookUrl(){
+  navigator.clipboard.writeText(syncUrl||'').then(()=>toast('Webhook URL copied'));
+}
+function copyLineCode(){
+  const code=`function sendLineNotify(message) {
+  const token = PropertiesService.getScriptProperties().getProperty('LINE_TOKEN');
+  if (!token) return;
+  UrlFetchApp.fetch('https://notify-api.line.me/api/notify', {
+    method: 'post',
+    headers: { Authorization: 'Bearer ' + token },
+    payload: { message: message }
+  });
+}
+function dailyBriefing() {
+  const daysLeft = getDaysToLaunch();
+  sendLineNotify('☽ PROPHECY — ' + daysLeft + 'd to launch');
+}`;
+  navigator.clipboard.writeText(code).then(()=>toast('Code copied to clipboard'));
+}
+
+// ─── QUICK CAPTURE ──────────────────────────────────────
+const CAP_MODE_CONFIG={
+  auto:   {icon:'✦',title:'Paste anything here',sub:'AI detects the type automatically',hint:'Works with LINE messages, meeting notes, voice-to-text, anything'},
+  decision:{icon:'💬',title:'Team decision',sub:'Log a decision from LINE or a meeting',hint:'Who decided what, when, and any action items'},
+  sample:  {icon:'🧵',title:'Sample notes',sub:'Feedback from a fitting or sample review',hint:'Issues, measurements, changes needed, next steps'},
+  vendor:  {icon:'📋',title:'Vendor / supplier note',sub:'Quote, contact, or supplier info',hint:'Name, price, MOQ, lead time, decision deadline'},
+  expense: {icon:'฿',title:'Expense or receipt',sub:'Log a payment or purchase',hint:'Amount, what for, who paid, date'},
+  task:    {icon:'✓',title:'Task or deadline',sub:'Add a task from a message',hint:'What needs doing, who owns it, by when'},
+};
+function setCapMode(m){
+  capMode=m;
+  document.querySelectorAll('.cap-mode').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const cfg=CAP_MODE_CONFIG[m];
+  document.getElementById('cap-icon').textContent=cfg.icon;
+  document.getElementById('cap-box-title').textContent=cfg.title;
+  document.getElementById('cap-box-sub').textContent=cfg.sub;
+  document.getElementById('cap-hint').textContent=cfg.hint;
+}
+function fillTemplate(type){
+  const examples={
+    sample:'Sample 3 feedback (March 10):\n- Neckline too wide — reduce by 2cm\n- Sleeve length +2cm\n- Back dart needs adjusting — currently pulling\n- Overall drape good\n\nNext step: Re-fit in 2 weeks with Pom and Guy.',
+    vendor:'K.Malee Textiles — silk-linen blend\nPrice: 850 THB per metre\nMOQ: 50 metres\nLead time: 3 weeks\nContact: 02-234-5678 / Pratunam area\nDecision needed by Friday March 13.',
+    decision:'Team decision (LINE, March 9):\nAgreed to go with Shopify for the launch website.\nSharp to set up store by March 28.\nGuy to brief the designer on brand guidelines by March 14.\nBudget: max 15,000 THB for setup.',
+    expense:'Expense: Fabric samples — K.Malee Textiles\nAmount: 4,200 THB\nPaid by: Pom\nDate: March 10, 2026\nCategory: Production / Sampling',
+    deadline:'Pom to confirm production capacity and timeline with factory partner by April 5.\nCritical — this gates the entire production schedule.\nIf not confirmed by April 5, launch date is at risk.',
+    contact:'Supplier: K.Malee Textiles\nContact person: K. Malee\nPhone: 02-234-5678\nLocation: Pratunam, Bangkok\nSpecialty: Silk blends, crêpe, linen\nPrevious orders: Fabric samples March 2026',
+  };
+  document.getElementById('cap-input').value=examples[type]||'';
+  document.getElementById('cap-input').focus();
+  // switch to matching mode
+  const modeMap={sample:'sample',vendor:'vendor',decision:'decision',expense:'expense',deadline:'task',contact:'vendor'};
+  const targetMode=modeMap[type]||'auto';
+  document.querySelectorAll('.cap-mode').forEach(b=>b.classList.remove('active'));
+  const modeEls=[...document.querySelectorAll('.cap-mode')];
+  const match=modeEls.find(b=>b.getAttribute('onclick')?.includes(targetMode));
+  if(match)match.classList.add('active');
+}
+
+async function runCapture(){
+  if(capLoading)return;
+  const input=document.getElementById('cap-input').value.trim();
+  if(!input){document.getElementById('cap-input').focus();return;}
+  capLoading=true;
+  const btn=document.getElementById('cap-btn');
+  btn.disabled=true;btn.textContent='Processing…';
+  document.getElementById('cap-result').style.display='none';
+
+  const today=new Date().toISOString().split('T')[0];
+  const prompt=`You are the operational AI for PROPHECY, a Bangkok luxury womenswear startup launching July 1, 2026. Today is ${today}.
+
+Founders: Sharp (Finance/Ops), Guy (Creative Director), Pom (Production/Technical)
+Categories: collection, production, website, finance, brand, operations, strategy
+
+A founder has pasted this raw note:
+---
+${input}
+---
+
+Extract ALL actionable items. For each item return a JSON object.
+Return a JSON array of items. Each item MUST have these fields:
+- type: "event" | "task" | "expense" | "contact" | "decision" | "note"
+- title: short clear title (max 8 words)
+- detail: one sentence summary
+- owner: "sharp" or "guy" or "pom" or "all" (who should action this)
+- category: one of the PROPHECY categories above
+- priority: "low" | "medium" | "high" | "critical"
+- date: ISO date string if mentioned/implied, else null
+- amount: number in THB if an expense, else null
+- tags: array of 1-3 short keyword strings
+
+Return ONLY valid JSON array, no markdown, no explanation.`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    const txt=d.content[0].text.trim();
+    const items=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    pendingCaptures=items;
+    renderCaptureResult(items);
+    document.getElementById('cap-result').style.display='block';
+  }catch(e){
+    document.getElementById('cap-result').style.display='block';
+    document.getElementById('cap-result-body').innerHTML=`<div style="color:var(--rose);font-size:12px;padding:8px 0">Could not process — try again or check your connection.</div>`;
+    document.getElementById('crh-status').textContent='Error';
+    document.getElementById('crh-status').className='crh-status';
+  }
+  capLoading=false;btn.disabled=false;btn.textContent='✦ Process & Structure';
+}
+
+function renderCaptureResult(items){
+  const typeIcons={event:'📅',task:'✓',expense:'฿',contact:'👤',decision:'💬',note:'📝'};
+  const typeBgs={event:'rgba(58,96,138,.07)',task:'rgba(124,92,154,.07)',expense:'rgba(58,122,92,.07)',contact:'rgba(184,150,90,.07)',decision:'rgba(176,64,96,.07)',note:'rgba(90,140,160,.07)'};
+  const ownerFor=id=>FOUNDERS.find(f=>f.id===id)||{name:id||'All',color:'#aaa'};
+  const priColor={low:'var(--ghost)',medium:'var(--amber)',high:'var(--rose)',critical:'#e01050'};
+
+  document.getElementById('crh-status').textContent=`${items.length} item${items.length!==1?'s':''} found`;
+  document.getElementById('crh-status').className='crh-status ok';
+
+  document.getElementById('cap-result-body').innerHTML=items.map((item,i)=>{
+    const f=ownerFor(item.owner);
+    return `<div class="parsed-item" style="background:${typeBgs[item.type]||'var(--paper)'}">
+      <div class="pi-icon">${typeIcons[item.type]||'📎'}</div>
+      <div class="pi-content">
+        <div class="pi-type">${item.type}</div>
+        <div class="pi-title">${item.title}</div>
+        <div class="pi-detail">${item.detail}</div>
+        <div class="pi-tags">
+          <span class="pi-tag" style="background:${f.bg||'rgba(124,92,154,.1)'};color:${f.color}">${f.name}</span>
+          ${item.date?`<span class="pi-tag" style="background:rgba(58,96,138,.08);color:var(--slate)">${item.date}</span>`:''}
+          ${item.amount?`<span class="pi-tag" style="background:rgba(58,122,92,.08);color:var(--sage)">฿${item.amount.toLocaleString()}</span>`:''}
+          <span class="pi-tag" style="background:var(--paper);color:var(--ghost);border:1px solid var(--line)">${item.category}</span>
+          <span class="pi-tag" style="color:${priColor[item.priority]||'var(--ghost)'};background:transparent;border:1px solid currentColor">${item.priority}</span>
+        </div>
+        <div class="pi-actions">
+          ${item.type==='event'||item.type==='task'?`<button class="pi-btn primary" onclick="addCaptureToCalendar(${i})">+ Calendar</button>`:''}
+          ${item.type==='expense'?`<button class="pi-btn primary" onclick="addCaptureToFinance(${i})">+ Finance</button>`:''}
+          <button class="pi-btn secondary" onclick="editCaptureItem(${i})">Edit</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addCaptureToCalendar(i){
+  const item=pendingCaptures[i];if(!item)return;
+  const ev={
+    id:'cap_'+Date.now(),
+    title:item.title,
+    date:item.date||new Date().toISOString().split('T')[0],
+    time:'',
+    category:item.category||'strategy',
+    owners:item.owner==='all'?['sharp','guy','pom']:[item.owner||'sharp'],
+    priority:item.priority||'medium',
+    notes:item.detail||'',
+    recurring:''
+  };
+  events.push(ev);saveLocal();
+  renderAll();
+  toast(`"${item.title}" added to calendar`);
+  pushEvent(ev);
+}
+function addCaptureToFinance(i){
+  const item=pendingCaptures[i];if(!item)return;
+  toast(`Expense logged: ฿${(item.amount||0).toLocaleString()} — ${item.title}`);
+}
+function editCaptureItem(i){
+  const item=pendingCaptures[i];if(!item)return;
+  openModal({
+    title:item.title,
+    date:item.date||new Date().toISOString().split('T')[0],
+    time:'',
+    category:item.category||'collection',
+    owners:item.owner==='all'?['sharp','guy','pom']:[item.owner||'sharp'],
+    priority:item.priority||'medium',
+    notes:item.detail||''
+  });
+}
+function saveAllCaptures(){
+  if(!pendingCaptures.length)return;
+  let added=0;
+  pendingCaptures.forEach(item=>{
+    if(item.type==='event'||item.type==='task'||item.type==='decision'){
+      const ev={id:'cap_'+Date.now()+'_'+added,title:item.title,date:item.date||new Date().toISOString().split('T')[0],time:'',category:item.category||'strategy',owners:item.owner==='all'?['sharp','guy','pom']:[item.owner||'sharp'],priority:item.priority||'medium',notes:item.detail||'',recurring:''};
+      events.push(ev);added++;
+    }
+  });
+  saveLocal();
+  // Save to captures history
+  const capture={id:'cap_'+Date.now(),raw:document.getElementById('cap-input').value.trim().substring(0,120),items:pendingCaptures,saved:new Date().toLocaleDateString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})};
+  captures.unshift(capture);
+  if(captures.length>20)captures=captures.slice(0,20);
+  localStorage.setItem(CAPTURES_KEY,JSON.stringify(captures));
+  updateCapBadge();renderSavedCaptures();
+  renderAll();pushAll();
+  pendingCaptures=[];
+  document.getElementById('cap-result').style.display='none';
+  document.getElementById('cap-input').value='';
+  toast(`${added} item${added!==1?'s':''} saved to Prophecy ✓`);
+}
+function updateCapBadge(){
+  const b=document.getElementById('cap-badge');
+  if(b)b.textContent=captures.length||'';
+}
+function renderSavedCaptures(){
+  const sec=document.getElementById('saved-captures-section');
+  const list=document.getElementById('saved-captures-list');
+  if(!sec||!list)return;
+  if(!captures.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  list.innerHTML=captures.slice(0,6).map(c=>`
+    <div class="sc-item">
+      <span class="sci-icon">📎</span>
+      <div class="sci-body">
+        <div class="sci-title">${c.raw||'Untitled capture'}…</div>
+        <div class="sci-meta">${c.items?.length||0} items · ${c.saved}</div>
+      </div>
+      <span class="sci-badge" style="background:rgba(124,92,154,.08);color:var(--plum)">${c.items?.length||0}</span>
+    </div>`).join('');
+}
+
+// ─── COUNTDOWN ───────────────────────────────────────────
+function updateCountdown(){
+  const d=Math.ceil((LAUNCH_DATE-new Date())/86400000);
+  document.getElementById('cdtxt').textContent=d+' days';
+  document.getElementById('kpi-days').textContent=d;
+  const tasks14=events.filter(e=>{const dt=new Date(e.date);const today=new Date();today.setHours(0,0,0,0);return dt>=today&&(dt-today)/86400000<=14;}).length;
+  document.getElementById('kpi-tasks').textContent=tasks14;
+}
+function updateNextMs(){
+  const today=new Date();
+  const next=MILESTONES.find(m=>new Date(m.date)>today);
+  if(next){
+    const dt=new Date(next.date);
+    document.getElementById('kpi-next-ms').textContent=dt.toLocaleDateString('en',{month:'short',day:'numeric'});
+    document.getElementById('kpi-next-ms-label').textContent=next.title;
+  }
+}
+
+// ─── FOUNDER PILLS ───────────────────────────────────────
+function buildFounderPills(){
+  const el=document.getElementById('founder-pills');
+  el.innerHTML=`<button class="fp active-pill" onclick="filterFounder('all')" id="fp-all" style="border-color:#ddd;color:var(--muted)">All</button>`+
+    FOUNDERS.map(f=>`<button class="fp" onclick="filterFounder('${f.id}')" id="fp-${f.id}" style="border-color:${f.border};color:${f.color}"><span class="pdot" style="background:${f.color}"></span>${f.name}</button>`).join('');
+}
+function filterFounder(id){
+  activeFounder=id;
+  document.querySelectorAll('.fp').forEach(b=>b.classList.remove('active-pill'));
+  document.getElementById(`fp-${id}`)?.classList.add('active-pill');
+  renderAll();
+}
+
+// ─── CAT BAR ────────────────────────────────────────────
+function buildCatBar(){
+  document.getElementById('cat-bar').innerHTML=CATEGORIES.map(c=>`<button class="cpill" id="cp-${c.id}" onclick="toggleCat('${c.id}')" style="color:${c.color};border-color:${c.color}44;background:transparent">${c.label}</button>`).join('');
+}
+function toggleCat(id){
+  if(activeCats.has(id))activeCats.delete(id);else activeCats.add(id);
+  document.querySelectorAll('.cpill').forEach(b=>{
+    const cid=b.id.replace('cp-','');const c=CATEGORIES.find(x=>x.id===cid);
+    b.style.background=activeCats.has(cid)?c.bg:'transparent';
+  });
+  renderCal();
+}
+function filteredEvents(){
+  return events.filter(ev=>{
+    if(activeCats.size&&!activeCats.has(ev.category))return false;
+    if(activeFounder!=='all'&&!ev.owners?.includes(activeFounder))return false;
+    return true;
+  });
+}
+function catFor(id){return CATEGORIES.find(c=>c.id===id)||{color:'#aaa',bg:'#f5f5f5',label:id};}
+function founderFor(id){return FOUNDERS.find(f=>f.id===id)||{color:'#aaa',name:id};}
+
+// ─── PAGES ──────────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`pg-${id}`)?.classList.add('active');
+  document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));
+  const map={overview:0,capture:1,col:2,work:3,gantt:4,cal:5,fin:6,connect:7};
+  document.querySelectorAll('.snav')[map[id]??0]?.classList.add('active');
+  const titles={overview:'Overview',capture:'Quick Capture',col:'Collection',work:'Work Tracker',gantt:'Gantt Chart',cal:'Calendar',fin:'Finance',connect:'Connections'};
+  document.getElementById('tb-title').textContent=titles[id]||'';
+  if(id==='overview'){renderDash();updateNextMs();}
+  if(id==='cal')renderCal();
+  if(id==='connect')renderConnections();
+  if(id==='capture')renderSavedCaptures();
+  if(id==='col')renderCollection();
+  if(id==='work')renderWork();
+  if(id==='gantt')renderGantt();
+}
+function renderAll(){renderDash();renderCal();renderCSPanel();}
+
+// ─── WORK TRACKER DATA ────────────────────────────────────
+const TASKS_KEY='prophecy_tasks_v2';
+let tasks=[];
+let workFilter='all';
+let editingTaskId=null;
+let tmOwner='sharp',tmCat='strategy';
+
+const RESP_MATRIX=[
+  {domain:'Finance & Cash',tasks:'P&L, expense tracking, equity register, investor prep',sharp:'lead',guy:'none',pom:'support'},
+  {domain:'Operations',tasks:'Timelines, Sheets, HQ dashboard, vendor contracts',sharp:'lead',guy:'support',pom:'support'},
+  {domain:'Strategy',tasks:'Business model, pricing, brand positioning, partnerships',sharp:'lead',guy:'review',pom:'review'},
+  {domain:'Collection Design',tasks:'Silhouettes, creative direction, fabric selection',sharp:'none',guy:'lead',pom:'support'},
+  {domain:'Brand & Identity',tasks:'Logo, visual identity, lookbook art direction',sharp:'review',guy:'lead',pom:'none'},
+  {domain:'Marketing & Content',tasks:'Social, campaign, launch PR, photographer',sharp:'support',guy:'lead',pom:'none'},
+  {domain:'Production',tasks:'Tech packs, grading, sample management',sharp:'none',guy:'support',pom:'lead'},
+  {domain:'Sourcing',tasks:'Fabric suppliers, trims, MOQ negotiations',sharp:'support',guy:'support',pom:'lead'},
+  {domain:'Quality & Fitting',tasks:'Sample review, construction QC, fit corrections',sharp:'none',guy:'review',pom:'lead'},
+  {domain:'Website',tasks:'Platform, copy, product pages, checkout flow',sharp:'support',guy:'support',pom:'support'},
+];
+
+// ─── TASKS: sourced from 16. TimeLine 2025-2026 docs ──────────────────────────
+const SEED_TASKS=[
+  // ── SHARP — THIS WEEK (15-21 Mar) ────────────────────────────
+  {id:'t_s1',title:'Fabric & Unit per SKU — confirm prices',owner:'sharp',category:'finance',priority:'critical',due:'2026-03-17',notes:'Calculate best fabric length per unit. 1st confirmation to Jean & Jane (Denim).',status:'open'},
+  {id:'t_s2',title:'NDA — finalize for Knit & Denim factories',owner:'sharp',category:'operations',priority:'critical',due:'2026-03-16',notes:'Must be confirmed & ready for Knit & Denim factory by 16/03. In Thai + English.',status:'open'},
+  {id:'t_s3',title:'Production investment — finalize Knit & Denim cost',owner:'sharp',category:'finance',priority:'critical',due:'2026-03-17',notes:'INVEST FOR DENIMs by 17/03. Rest by 30/03.',status:'open'},
+  {id:'t_s4',title:'Cost breakdown — update everything',owner:'sharp',category:'finance',priority:'high',due:'2026-03-21',notes:'Total Expense, Product Expenses, CashFlow, Balance Sheet.',status:'open'},
+  {id:'t_s5',title:'Find new knitting factory — ASAP',owner:'sharp',category:'production',priority:'critical',due:'2026-03-21',notes:'MFG may still be used for some. Critical blocker for production.',status:'open'},
+  // ── SHARP — NEXT WEEK (22-28 Mar) ────────────────────────────
+  {id:'t_s6',title:'Fabric & Unit per SKU — K.Tuan & K.Bank confirmation',owner:'sharp',category:'finance',priority:'high',due:'2026-03-28',notes:'Calculate price for machinists K.Tuan and K.Bank.',status:'open'},
+  {id:'t_s7',title:'NDA — draft for all remaining factories',owner:'sharp',category:'operations',priority:'high',due:'2026-03-28',notes:'All factory NDAs in Thai & English.',status:'open'},
+  {id:'t_s8',title:'SIGN contracts — English & Thai',owner:'sharp',category:'operations',priority:'critical',due:'2026-03-22',notes:'All founders must sign. Both language versions.',status:'open'},
+  {id:'t_s9',title:'Production full investment — rest by 30/03',owner:'sharp',category:'finance',priority:'critical',due:'2026-03-30',notes:'ALL remaining production investment. Gates factory start.',status:'open'},
+  {id:'t_s10',title:'Intern employment contract — create',owner:'sharp',category:'operations',priority:'high',due:'2026-03-20',notes:'Must be ready ASAP per timeline.',status:'open'},
+  // ── GUY — THIS WEEK (15-21 Mar) ──────────────────────────────
+  {id:'t_g1',title:'Send ALL KNITS to MFG factory',owner:'guy',category:'production',priority:'critical',due:'2026-03-17',notes:'All knitwear pieces MUST reach Knit Factory (MFG) on 17/03.',status:'open'},
+  {id:'t_g2',title:'Send ALL DENIMS to Jean & Jane factory',owner:'guy',category:'production',priority:'critical',due:'2026-03-18',notes:'All denim pieces MUST reach Jean & Jane on 18/03.',status:'open'},
+  {id:'t_g3',title:'Send Tech-Pack to K.Tuan — shirt & trouser',owner:'guy',category:'production',priority:'critical',due:'2026-03-16',notes:'Must finish and send by 16/03/2026.',status:'open'},
+  {id:'t_g4',title:'Spec sheet — finalize Knit & Denim',owner:'guy',category:'production',priority:'critical',due:'2026-03-17',notes:'Finalize spec sheets for all knits and denims.',status:'open'},
+  {id:'t_g5',title:'Fabrics & materials — send to Denim & Knit factory',owner:'guy',category:'production',priority:'critical',due:'2026-03-17',notes:'Must be received by factories on sampling day.',status:'open'},
+  {id:'t_g6',title:'Label & washtag — confirm & order',owner:'guy',category:'production',priority:'high',due:'2026-03-21',notes:'Confirm design layout & contact factory.',status:'open'},
+  {id:'t_g7',title:'Design — new knitted top: MUST confirm',owner:'guy',category:'collection',priority:'critical',due:'2026-03-17',notes:'',status:'open'},
+  {id:'t_g8',title:'Design — Cape Long Dress neckline confirm',owner:'guy',category:'collection',priority:'high',due:'2026-03-18',notes:'Confirm cape around neckline & other details.',status:'open'},
+  {id:'t_g9',title:'Find new knitting factory — ASAP',owner:'guy',category:'production',priority:'critical',due:'2026-03-21',notes:'Critical. Must source & contact new knit factory this week.',status:'open'},
+  {id:'t_g10',title:'Find & book model for fitting',owner:'guy',category:'production',priority:'high',due:'2026-03-21',notes:'2nd fitting: 27-30 April. Book model now.',status:'open'},
+  // ── GUY — NEXT WEEKS ─────────────────────────────────────────
+  {id:'t_g11',title:'Confirm fabric for 2nd Denim samples — final',owner:'guy',category:'production',priority:'high',due:'2026-03-28',notes:'Denims: MUST confirm fabric for 2nd samples this week.',status:'open'},
+  {id:'t_g12',title:'Communication — start planning & info gathering',owner:'guy',category:'brand',priority:'medium',due:'2026-03-28',notes:'Start gathering info for brand communications.',status:'open'},
+  // ── POM — THIS WEEK (15-21 Mar) ──────────────────────────────
+  {id:'t_p1',title:'Send ALL KNITS to MFG factory',owner:'pom',category:'production',priority:'critical',due:'2026-03-17',notes:'Coordinate with Guy. All knitwear to Knit Factory (MFG) on 17/03.',status:'open'},
+  {id:'t_p2',title:'Send ALL DENIMS to Jean & Jane',owner:'pom',category:'production',priority:'critical',due:'2026-03-18',notes:'All denim pieces to Jean & Jane on 18/03.',status:'open'},
+  {id:'t_p3',title:'Send Shirt & Trouser to K.Pao — 19/03',owner:'pom',category:'production',priority:'critical',due:'2026-03-19',notes:'Send patterns to K.Pao on 19/03 Thursday. Collect before 26/03.',status:'open'},
+  {id:'t_p4',title:'KNITWEAR patterns — finalize & amend all',owner:'pom',category:'production',priority:'critical',due:'2026-03-17',notes:'All knitted garments must be finalized and ready for sampling.',status:'open'},
+  {id:'t_p5',title:'Patterns — amend all remaining garments',owner:'pom',category:'production',priority:'high',due:'2026-03-21',notes:'',status:'open'},
+  {id:'t_p6',title:'Cape Long Dress pattern — amend for 3rd toile',owner:'pom',category:'production',priority:'high',due:'2026-03-21',notes:'Design amended — waiting for Guy confirmation.',status:'open'},
+  {id:'t_p7',title:'Find new knitting factory — ASAP',owner:'pom',category:'production',priority:'critical',due:'2026-03-21',notes:'Critical blocker shared with Guy and Sharp.',status:'open'},
+  {id:'t_p8',title:'Schedule — plan & recheck',owner:'pom',category:'operations',priority:'medium',due:'2026-03-21',notes:'Weekly schedule review.',status:'open'},
+  // ── POM — NEXT WEEKS ─────────────────────────────────────────
+  {id:'t_p9',title:'Send Venus Dress to K.Bank — 24/03',owner:'pom',category:'production',priority:'critical',due:'2026-03-24',notes:'Send to K.Bank Tuesday. Collect before 26/03.',status:'open'},
+  {id:'t_p10',title:'Collect samples from Knit & Denim factory — QC',owner:'pom',category:'production',priority:'high',due:'2026-03-28',notes:'Collect and quality-check all incoming samples.',status:'open'},
+  {id:'t_p11',title:'Cape/Venus Trouser/Jacket — toile ready for fitting',owner:'pom',category:'production',priority:'high',due:'2026-03-28',notes:'New finished toile needed for weekend fitting.',status:'open'},
+  {id:'t_p12',title:'2nd fitting prep — 27-30 April',owner:'pom',category:'production',priority:'high',due:'2026-04-20',notes:'2nd fitting between 27/04 - 30/04. P\'Lex visiting same window.',status:'open'},
+];
+
+function loadTasks(){
+  const s=localStorage.getItem(TASKS_KEY);
+  tasks=s?JSON.parse(s):[...SEED_TASKS];
+}
+function saveTasks(){localStorage.setItem(TASKS_KEY,JSON.stringify(tasks));}
+function updateWorkBadge(){
+  const open=tasks.filter(t=>t.status!=='done').length;
+  const b=document.getElementById('work-badge');
+  if(b)b.textContent=open||'';
+}
+
+function filterWorkView(f){
+  workFilter=f;
+  document.querySelectorAll('.wh-btn').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById(`wf-${f}`);if(el)el.style.background='';
+  document.getElementById(`wf-${f}`)?.classList.add('active');
+  renderWorkCols();
+}
+
+function renderWork(){
+  renderRespMatrix();
+  renderWorkCols();
+}
+
+function renderRespMatrix(){
+  const icons={lead:'●',support:'◑',review:'◎',none:'·'};
+  const cls={lead:'rb-lead',support:'rb-support',review:'rb-review',none:'rb-none'};
+  document.getElementById('resp-matrix-body').innerHTML=RESP_MATRIX.map(r=>`
+    <tr>
+      <td>
+        <div class="rmt-domain">${r.domain}</div>
+        <div class="rmt-task">${r.tasks}</div>
+      </td>
+      <td style="font-size:11px;color:var(--muted)"></td>
+      <td class="resp-cell"><span class="resp-badge ${cls[r.sharp]}" title="${r.sharp}">${icons[r.sharp]}</span></td>
+      <td class="resp-cell"><span class="resp-badge ${cls[r.guy]}" title="${r.guy}">${icons[r.guy]}</span></td>
+      <td class="resp-cell"><span class="resp-badge ${cls[r.pom]}" title="${r.pom}">${icons[r.pom]}</span></td>
+    </tr>`).join('');
+}
+
+function renderWorkCols(){
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('work-cols').innerHTML=FOUNDERS.map(f=>{
+    let ftasks=tasks.filter(t=>t.owner===f.id);
+    if(workFilter==='open') ftasks=ftasks.filter(t=>t.status!=='done');
+    if(workFilter==='overdue') ftasks=ftasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<today);
+    ftasks.sort((a,b)=>{
+      const po={critical:0,high:1,medium:2,low:3};
+      return (po[a.priority]||3)-(po[b.priority]||3);
+    });
+    const open=tasks.filter(t=>t.owner===f.id&&t.status!=='done').length;
+    const due=tasks.filter(t=>t.owner===f.id&&t.status!=='done'&&t.due&&new Date(t.due)<today).length;
+    const done=tasks.filter(t=>t.owner===f.id&&t.status==='done').length;
+    return`<div class="founder-col">
+      <div class="fc-header">
+        <div class="fc-founder">
+          <div class="fc-avatar" style="background:${f.color}">${f.name[0]}</div>
+          <div>
+            <div class="fc-name">${f.name}</div>
+            <div class="fc-role">${f.id==='sharp'?'Finance & Operations':f.id==='guy'?'Creative Director':'Production Lead'}</div>
+          </div>
+        </div>
+        <div class="fc-stats">
+          <div class="fc-stat"><div class="fcs-num open">${open}</div><div class="fcs-lbl">Open</div></div>
+          <div class="fc-stat"><div class="fcs-num due">${due}</div><div class="fcs-lbl">Overdue</div></div>
+          <div class="fc-stat"><div class="fcs-num done">${done}</div><div class="fcs-lbl">Done</div></div>
+        </div>
+      </div>
+      <div class="fc-body">
+        ${ftasks.length===0?`<div class="empty-st" style="text-align:center;padding:20px 0">${workFilter==='overdue'?'Nothing overdue ✓':'No tasks'}</div>`:''}
+        ${ftasks.map(t=>renderTaskCard(t,today)).join('')}
+      </div>
+      <div class="fc-add">
+        <input class="fc-add-input" id="quick-add-${f.id}" placeholder="Quick add task…" onkeydown="if(event.key==='Enter')quickAddTask('${f.id}')">
+        <button class="fc-add-btn" onclick="quickAddTask('${f.id}')">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTaskCard(t,today){
+  const c=catFor(t.category);
+  const due=t.due?new Date(t.due):null;
+  const diff=due?Math.ceil((due-today)/86400000):null;
+  const dueCls=diff===null?'ok':diff<0?'overdue':diff<=3?'soon':'ok';
+  const dueStr=diff===null?'No due date':diff<0?`${Math.abs(diff)}d overdue`:diff===0?'Due today':diff===1?'Due tmrw':`Due in ${diff}d`;
+  return`<div class="task-card pri-${t.priority} ${t.status==='done'?'status-done':''}" onclick="openTaskModal(null,'${t.id}')">
+    <div class="tc-top">
+      <div class="tc-check ${t.status==='done'?'checked':''}" onclick="event.stopPropagation();toggleTaskDone('${t.id}')">${t.status==='done'?'✓':''}</div>
+      <div class="tc-title">${t.title}</div>
+    </div>
+    <div class="tc-meta">
+      <span class="tc-cat" style="background:${c.bg};color:${c.color}">${c.label}</span>
+      <span class="tc-due ${dueCls}">${dueStr}</span>
+    </div>
+    ${t.notes?`<div class="tc-note">${t.notes}</div>`:''}
+  </div>`;
+}
+
+function toggleTaskDone(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  t.status=t.status==='done'?'open':'done';
+  saveTasks();updateWorkBadge();renderWorkCols();
+  toast(t.status==='done'?'Task done ✓':'Task reopened');
+}
+
+function quickAddTask(ownerId){
+  const inp=document.getElementById(`quick-add-${ownerId}`);
+  if(!inp||!inp.value.trim())return;
+  const t={id:'t_'+Date.now(),title:inp.value.trim(),owner:ownerId,category:'strategy',priority:'medium',due:'',notes:'',status:'open'};
+  tasks.push(t);saveTasks();inp.value='';
+  updateWorkBadge();renderWorkCols();
+  toast('Task added');
+}
+
+// Task modal
+function buildTaskModalOptions(){
+  document.getElementById('tm-owner-opts').innerHTML=FOUNDERS.map(f=>`
+    <button class="oopt" id="tmo-${f.id}" onclick="setTmOwner('${f.id}')">
+      <span class="pdot" style="background:${f.color}"></span>${f.name}
+    </button>`).join('');
+  document.getElementById('tm-cat-opts').innerHTML=CATEGORIES.map(c=>`
+    <button class="copt" id="tmc-${c.id}" onclick="setTmCat('${c.id}')" style="border-color:${c.color}44;color:${c.color}">${c.label}</button>`).join('');
+  updateTaskModalSel();
+}
+function setTmOwner(id){tmOwner=id;updateTaskModalSel();}
+function setTmCat(id){tmCat=id;updateTaskModalSel();}
+function updateTaskModalSel(){
+  FOUNDERS.forEach(f=>{const el=document.getElementById(`tmo-${f.id}`);if(!el)return;el.style.background=tmOwner===f.id?f.bg:'#fafafa';el.style.borderColor=tmOwner===f.id?f.color:'var(--line)';});
+  CATEGORIES.forEach(c=>{const el=document.getElementById(`tmc-${c.id}`);if(!el)return;el.style.background=tmCat===c.id?c.bg:'#fafafa';el.style.borderColor=tmCat===c.id?c.color:c.color+'44';el.style.fontWeight=tmCat===c.id?'700':'600';});
+}
+function openTaskModal(prefillOwner,taskId){
+  editingTaskId=taskId||null;
+  const t=taskId?tasks.find(x=>x.id===taskId):null;
+  document.getElementById('tm-title').textContent=t?'Edit Task':'New Task';
+  document.getElementById('tm-name').value=t?.title||'';
+  document.getElementById('tm-due').value=t?.due||new Date().toISOString().split('T')[0];
+  document.getElementById('tm-pri').value=t?.priority||'medium';
+  document.getElementById('tm-notes').value=t?.notes||'';
+  tmOwner=t?.owner||prefillOwner||'sharp';
+  tmCat=t?.category||'strategy';
+  updateTaskModalSel();
+  document.getElementById('tm-del-btn').style.display=t?'block':'none';
+  document.getElementById('task-modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('tm-name').focus(),80);
+}
+function closeTaskModal(){document.getElementById('task-modal-bg').classList.remove('open');}
+function saveTask(){
+  const title=document.getElementById('tm-name').value.trim();if(!title){document.getElementById('tm-name').focus();return;}
+  const t={
+    id:editingTaskId||'t_'+Date.now(),
+    title,
+    owner:tmOwner,
+    category:tmCat,
+    priority:document.getElementById('tm-pri').value,
+    due:document.getElementById('tm-due').value,
+    notes:document.getElementById('tm-notes').value,
+    status:editingTaskId?tasks.find(x=>x.id===editingTaskId)?.status||'open':'open'
+  };
+  if(editingTaskId)tasks=tasks.map(x=>x.id===editingTaskId?t:x);else tasks.push(t);
+  saveTasks();closeTaskModal();updateWorkBadge();renderWorkCols();
+  toast(editingTaskId?'Task updated':'Task added');
+}
+function deleteTask(){
+  if(!editingTaskId)return;
+  tasks=tasks.filter(x=>x.id!==editingTaskId);
+  saveTasks();closeTaskModal();updateWorkBadge();renderWorkCols();
+  toast('Task deleted');
+}
+document.getElementById('task-modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTaskModal();});
+
+// ─── GANTT CHART ─────────────────────────────────────────
+let ganttZoom='full';
+function setGanttZoom(z){
+  ganttZoom=z;
+  document.getElementById('gz-full').classList.toggle('active',z==='full');
+  document.getElementById('gz-near').classList.toggle('active',z==='near');
+  renderGantt();
+}
+
+// ─── GANTT: sourced from 16. TimeLine 2025-2026 docs ──────────────────────────
+const GANTT_FUNCTIONS=[
+  {
+    id:'production',label:'Production',icon:'🧵',color:'#B04060',
+    rows:[
+      {title:'Fabric sourcing — initial (Oct 2025)',owners:['pom','guy'],start:'2025-10-08',end:'2025-11-01',notes:'Machinist & fabric market visits, initial contact'},
+      {title:'Toiling — 1st Capsule (all looks)',owners:['guy','pom'],start:'2025-12-01',end:'2026-01-31',notes:'Toile making, pattern cutting, sewing'},
+      {title:'Final fabric & materials order',owners:['pom','guy'],start:'2026-01-04',end:'2026-02-14',notes:'Order and confirm all final fabrics & materials'},
+      {title:'Sample round 1 — knits & denims',owners:['pom','guy'],start:'2026-02-15',end:'2026-03-08',notes:'1st toile finish: Venus Jacket, Knitted Polo, Denim Jean'},
+      {title:'1st Fitting (08/03/2026)',owners:['guy','pom'],start:'2026-03-08',end:'2026-03-08',notes:'DONE ✓'},
+      {title:'Send to Knit Factory (MFG) — 17/03',owners:['guy','pom'],start:'2026-03-15',end:'2026-03-17',notes:'ALL knitwear to MFG on 17/03. CRITICAL.'},
+      {title:'Send to Denim Factory (Jean & Jane) — 18/03',owners:['guy','pom'],start:'2026-03-15',end:'2026-03-18',notes:'ALL denims to Jean & Jane on 18/03. CRITICAL.'},
+      {title:'Send to K.Pao — Shirt & Trouser — 19/03',owners:['pom'],start:'2026-03-19',end:'2026-03-26',notes:'Collect before 26/03'},
+      {title:'Send to K.Bank — Venus Dress — 24/03',owners:['pom'],start:'2026-03-24',end:'2026-03-26',notes:'Collect before 26/03'},
+      {title:'Factory production (1.5–2 months)',owners:['pom'],start:'2026-03-18',end:'2026-05-20',notes:'All factories: 1.5-2 months production + QC'},
+      {title:'2nd Fitting — 27-30 April',owners:['guy','pom'],start:'2026-04-27',end:'2026-04-30',notes:'P\'Lex visits same window'},
+      {title:'Final QC & production completion',owners:['pom'],start:'2026-05-20',end:'2026-06-20',notes:'All production completed and QC passed'},
+    ]
+  },
+  {
+    id:'design',label:'Design & Collection',icon:'✦',color:'#7C5C9A',
+    rows:[
+      {title:'Initial concept & rough sketches',owners:['guy'],start:'2025-10-08',end:'2025-11-01',notes:'Brand image, moodboard, rough sketches for 1st capsule'},
+      {title:'Design confirmation rounds 1–3',owners:['guy'],start:'2025-11-01',end:'2025-11-30',notes:'3 rounds of design review & confirmation'},
+      {title:'Final design lock — all looks',owners:['guy'],start:'2026-01-04',end:'2026-01-31',notes:'Finalize all designs, looks, fabrics, colours, SKU'},
+      {title:'Tech packs — all garments',owners:['guy','pom'],start:'2026-02-15',end:'2026-03-16',notes:'Tech packs for knits, denims, shirt & trouser'},
+      {title:'Spec sheets — knit, denim, rest',owners:['guy','pom'],start:'2026-03-08',end:'2026-03-21',notes:'Finalize spec sheets for all garments'},
+      {title:'Label & washtag — confirm & order',owners:['guy'],start:'2026-03-15',end:'2026-03-21',notes:'Layout confirmed, order placed'},
+      {title:'2nd round design amendments from fitting',owners:['guy'],start:'2026-04-27',end:'2026-05-15',notes:'Post-fitting amendments'},
+      {title:'Final sample sign-off',owners:['guy','pom'],start:'2026-05-15',end:'2026-06-01',notes:'All garments signed off'},
+    ]
+  },
+  {
+    id:'brand',label:'Brand & Marketing',icon:'◈',color:'#B8965A',
+    rows:[
+      {title:'Brand image & identity (Oct–Nov 2025)',owners:['guy'],start:'2025-10-08',end:'2025-11-30',notes:'Moodboard, brand pillar, identity, story, position'},
+      {title:'Brand bible & manifesto',owners:['guy'],start:'2026-01-04',end:'2026-04-15',notes:'Full brand bible document'},
+      {title:'Lookbook concept & photographer selection',owners:['guy'],start:'2026-04-01',end:'2026-04-20',notes:'Shortlist & book photographer'},
+      {title:'Communication planning',owners:['guy','sharp'],start:'2026-03-22',end:'2026-05-01',notes:'Start gathering info, campaign planning'},
+      {title:'Photography & lookbook shoot',owners:['guy'],start:'2026-06-01',end:'2026-06-10',notes:''},
+      {title:'Launch campaign content',owners:['guy','sharp'],start:'2026-06-10',end:'2026-06-28',notes:'Final content for launch'},
+    ]
+  },
+  {
+    id:'finance',label:'Finance',icon:'฿',color:'#3A7A5C',
+    rows:[
+      {title:'Initial budget breakdown (Oct 2025)',owners:['sharp'],start:'2025-10-11',end:'2025-10-25',notes:'Renovation, fabrics, machines, machinists, fixed costs'},
+      {title:'1st Investment (Nov 2025)',owners:['sharp'],start:'2025-11-10',end:'2025-11-10',notes:'Fixed cost investment round 1'},
+      {title:'2nd Investment (Nov 2025)',owners:['sharp'],start:'2025-11-25',end:'2025-11-25',notes:'Fixed cost investment round 2'},
+      {title:'3rd Investment — fabrics & materials',owners:['sharp'],start:'2025-12-01',end:'2025-12-01',notes:''},
+      {title:'Sampling investment (฿75,000 — 25k each)',owners:['sharp'],start:'2026-03-08',end:'2026-03-08',notes:'DONE ✓ All three founders invested 25k each'},
+      {title:'Production investment — Knit & Denim',owners:['sharp'],start:'2026-03-15',end:'2026-03-17',notes:'INVEST FOR DENIMs by 17/03'},
+      {title:'Full production investment',owners:['sharp'],start:'2026-03-25',end:'2026-03-30',notes:'Rest of production: INVEST by 30/03'},
+      {title:'Cost breakdown — ongoing updates',owners:['sharp'],start:'2026-03-01',end:'2026-06-30',notes:'Product expenses, cashflow, balance sheet'},
+      {title:'Pre-launch P&L review',owners:['sharp'],start:'2026-06-15',end:'2026-06-25',notes:'Final finance review before launch'},
+    ]
+  },
+  {
+    id:'ops',label:'Operations & Legal',icon:'⚙',color:'#5A8CA0',
+    rows:[
+      {title:'Business direction & legal research',owners:['sharp'],start:'2025-10-12',end:'2025-11-09',notes:'Copyright, legal provisions, business plan'},
+      {title:'Factory contracts & agreements',owners:['sharp','pom'],start:'2025-11-20',end:'2025-11-30',notes:'Machinist confirmation & agreement'},
+      {title:'Founder contract — sign (ENG + TH)',owners:['sharp','guy','pom'],start:'2026-02-22',end:'2026-03-22',notes:'Both language versions. All founders sign.'},
+      {title:'NDA — Knit & Denim factory',owners:['sharp'],start:'2026-03-10',end:'2026-03-16',notes:'MUST be ready by 16/03 for Knit & Denim factory'},
+      {title:'NDA — remaining factories',owners:['sharp'],start:'2026-03-22',end:'2026-03-31',notes:'K.Tuan, K.Bank, K.Pao'},
+      {title:'Intern employment contract',owners:['sharp'],start:'2026-03-10',end:'2026-03-22',notes:'Create intern contract. Ready ASAP.'},
+      {title:'Sharing bank account — active',owners:['sharp'],start:'2026-03-08',end:'2026-03-08',notes:'DONE ✓'},
+      {title:'Launch ops planning',owners:['sharp','pom'],start:'2026-06-01',end:'2026-06-28',notes:''},
+    ]
+  },
+  {
+    id:'website',label:'Website',icon:'⬡',color:'#3A608A',
+    rows:[
+      {title:'Website developer research',owners:['sharp'],start:'2025-10-05',end:'2025-10-25',notes:'Cost, timeline, developer options'},
+      {title:'Platform decision (Shopify)',owners:['sharp','guy'],start:'2026-03-15',end:'2026-03-22',notes:'Decide platform. Gates dev start.'},
+      {title:'Site design & build',owners:['sharp'],start:'2026-04-01',end:'2026-05-20',notes:''},
+      {title:'Product pages, copy & assets',owners:['guy','sharp'],start:'2026-05-20',end:'2026-06-05',notes:''},
+      {title:'Staging → live',owners:['sharp'],start:'2026-05-31',end:'2026-06-01',notes:'Milestone'},
+    ]
+  },
+];
+
+function renderGantt(){
+  const today=new Date();today.setHours(0,0,0,0);
+  let rangeStart,rangeEnd;
+  if(ganttZoom==='full'){
+    rangeStart=new Date('2025-10-01');
+    rangeEnd=new Date('2026-07-05');
+  }else{
+    rangeStart=new Date('2026-03-10');
+    rangeEnd=new Date('2026-07-05');
+  }
+  const totalDays=Math.ceil((rangeEnd-rangeStart)/86400000);
+
+  // Build month headers
+  const months=[];
+  let cur=new Date(rangeStart.getFullYear(),rangeStart.getMonth(),1);
+  while(cur<=rangeEnd){
+    const ms=new Date(cur);
+    const me=new Date(cur.getFullYear(),cur.getMonth()+1,0);
+    const visStart=ms<rangeStart?rangeStart:ms;
+    const visEnd=me>rangeEnd?rangeEnd:me;
+    const pct=Math.max(0,(visEnd-visStart)/86400000/totalDays*100);
+    months.push({label:ms.toLocaleDateString('en',{month:'short'}).toUpperCase(),year:ms.getFullYear(),pct,isCur:ms.getMonth()===today.getMonth()&&ms.getFullYear()===today.getFullYear()});
+    cur.setMonth(cur.getMonth()+1);
+  }
+
+  // Today line position
+  const todayPct=Math.max(0,Math.min(100,(today-rangeStart)/86400000/totalDays*100));
+
+  function barStyle(startStr,endStr,color){
+    const s=new Date(startStr),e=new Date(endStr);
+    if(e<rangeStart||s>rangeEnd)return null;
+    const left=Math.max(0,(s-rangeStart)/86400000/totalDays*100);
+    const right=Math.min(100,(e-rangeStart)/86400000/totalDays*100);
+    const width=right-left;
+    if(width<=0)return null;
+    return{left:left.toFixed(2)+'%',width:width.toFixed(2)+'%',color};
+  }
+
+  // Milestone positions
+  const msPositions=MILESTONES.filter(m=>m.id!=='ms6').map(m=>{
+    const d=new Date(m.date);
+    if(d<rangeStart||d>rangeEnd)return null;
+    const pct=(d-rangeStart)/86400000/totalDays*100;
+    return{...m,pct};
+  }).filter(Boolean);
+
+  let html=`<div class="gantt-head-row">`;
+  months.forEach(m=>{
+    html+=`<div class="gantt-month ${m.isCur?'cur':''}" style="flex:${m.pct.toFixed(2)} 0 0">${m.label}</div>`;
+  });
+  html+=`</div>`;
+
+  GANTT_FUNCTIONS.forEach(fn=>{
+    html+=`<div class="gantt-group">
+      <div class="gantt-group-label">
+        <span class="gg-icon">${fn.icon}</span>
+        <span class="gg-name" style="color:${fn.color}">${fn.label}</span>
+      </div>`;
+    fn.rows.forEach(row=>{
+      const bs=barStyle(row.start,row.end,fn.color);
+      html+=`<div class="gantt-row" title="${row.title}${row.notes?' — '+row.notes:''}">
+        <div class="gantt-row-label">
+          <div class="grl-owners">
+            ${row.owners.map(o=>{const f=founderFor(o);return`<div class="grl-owner" style="background:${f.color}">${f.name[0]}</div>`;}).join('')}
+          </div>
+          <div class="grl-title">${row.title}</div>
+        </div>
+        <div class="gantt-timeline">
+          <div class="gantt-grid">${months.map(m=>`<div class="gantt-col ${m.isCur?'cur-month':''}" style="flex:${m.pct.toFixed(2)} 0 0"></div>`).join('')}</div>
+          ${bs?`<div class="gantt-bar-wrap" style="left:${bs.left};width:${bs.width}">
+            <div class="gantt-bar-inner" style="background:${bs.color}"></div>
+          </div>`:''}
+          <div class="gantt-today-line" style="left:${todayPct.toFixed(2)}%"></div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+
+  // Milestone markers row
+  html+=`<div class="gantt-group">
+    <div class="gantt-group-label"><span class="gg-icon">◆</span><span class="gg-name">Milestones</span></div>
+    <div class="gantt-row">
+      <div class="gantt-row-label" style="padding-left:24px;font-size:10px;color:var(--ghost)">Key dates</div>
+      <div class="gantt-timeline" style="position:relative">
+        <div class="gantt-grid">${months.map(m=>`<div class="gantt-col ${m.isCur?'cur-month':''}" style="flex:${m.pct.toFixed(2)} 0 0"></div>`).join('')}</div>
+        ${msPositions.map(m=>`<div class="gantt-milestone-marker" style="left:calc(${m.pct.toFixed(2)}% - 5px)" title="${m.title}"></div>`).join('')}
+        <div class="gantt-today-line" style="left:${todayPct.toFixed(2)}%"></div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('gantt-container').innerHTML=html;
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────
+function renderDash(){renderTracks();renderDashMs();renderDashUp();updateNextMs();}
+function fmtDate(d){
+  if(!d)return'';
+  try{const dt=new Date(d);const today=new Date();today.setHours(0,0,0,0);
+    const diff=Math.ceil((dt-today)/86400000);
+    if(diff===0)return'Today';if(diff===1)return'Tmrw';if(diff<7)return diff+'d';
+    return dt.toLocaleDateString('en',{month:'short',day:'numeric'});
+  }catch(e){return d;}
+}
+function renderTracks(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const daysLeft=Math.ceil((LAUNCH_DATE-today)/86400000);
+  const prog=Math.round(Math.max(0,Math.min(100,(1-daysLeft/120)*100)));
+  const prodEvs=events.filter(e=>e.category==='production'||e.category==='collection').filter(e=>new Date(e.date)>=today).slice(0,3);
+  const designEvs=events.filter(e=>e.category==='collection'||e.category==='brand').filter(e=>new Date(e.date)>=today).slice(0,3);
+  const opsEvs=events.filter(e=>['website','operations','strategy'].includes(e.category)).filter(e=>new Date(e.date)>=today).slice(0,3);
+  const tracks=[
+    {name:'Production',icon:'🧵',owner:'Pom · Guy',badge:'critical',badgeTxt:'At Risk',barColor:'#B04060',num:prodEvs.length,numSub:'tasks upcoming',prog,items:prodEvs.map(e=>({title:e.title,date:e.date,color:'#B04060',ev:e}))},
+    {name:'Design & Collection',icon:'✦',owner:'Guy',badge:'on-track',badgeTxt:'On Track',barColor:'#7C5C9A',num:designEvs.length,numSub:'open items',prog:Math.round(prog*.85),items:designEvs.map(e=>({title:e.title,date:e.date,color:'#7C5C9A',ev:e}))},
+    {name:'Finance',icon:'฿',owner:'Sharp',badge:'critical',badgeTxt:'Needs Action',barColor:'#B8965A',num:'−4,682',numSub:'THB net position',prog:0,special:true,items:[{title:'Founder top-up required',date:'Before April',color:'#8A6020',ev:null},{title:'Q1 expense review',date:'2026-03-12',color:'#3A7A5C',ev:events.find(e=>e.category==='finance')}]},
+    {name:'Back Office',icon:'⚙',owner:'Sharp',badge:'pending',badgeTxt:'In Progress',barColor:'#3A608A',num:opsEvs.length,numSub:'actions open',prog:Math.round(prog*.55),items:opsEvs.map(e=>({title:e.title,date:e.date,color:'#3A608A',ev:e}))},
+  ];
+  document.getElementById('tracks-grid').innerHTML=tracks.map(t=>`
+    <div class="track">
+      <div class="track-bar" style="background:${t.barColor}"></div>
+      <div class="track-head">
+        <div>
+          <div class="track-nm">${t.icon} ${t.name}</div>
+          <div class="track-owner-txt">${t.owner}</div>
+        </div>
+        <span class="t-badge tb-${t.badge}">${t.badgeTxt}</span>
+      </div>
+      <div class="track-body">
+        <div class="track-num" style="${t.special?'font-size:22px;color:var(--amber)':''}">${t.special?t.num:t.num}</div>
+        <div class="track-numsub">${t.numSub}</div>
+        <div class="track-bar-mini"><div class="tbm-fill" style="width:${t.prog}%;background:${t.barColor}"></div></div>
+      </div>
+      <div class="track-list">
+        ${t.items.map(i=>`<div class="tl-row" onclick="${i.ev?`openModal(${JSON.stringify(i.ev).replace(/"/g,'&quot;')})`:'showPage(\'fin\')'}">
+          <div class="tl-dot" style="background:${i.color}"></div>
+          <span class="tl-title">${i.title}</span>
+          <span class="tl-date" style="color:${i.color}">${fmtDate(i.date)}</span>
+        </div>`).join('')}
+        ${t.items.length===0?'<div class="tl-empty">No upcoming items</div>':''}
+      </div>
+    </div>`).join('');
+}
+function renderDashMs(){
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('dash-ms').innerHTML=MILESTONES.map((m,i)=>{
+    const d=new Date(m.date);const days=Math.ceil((d-today)/86400000);
+    const past=days<0;const isNext=!past&&MILESTONES.filter(x=>new Date(x.date)>=today).indexOf(m)===0;
+    const nc=past?'done':isNext?'next':m.id==='ms6'?'launch':'fut';
+    const dCls=days<0?'md-past':days<14?'md-soon':days<30?'md-med':'md-ok';
+    return`<div class="ms-item">
+      <div class="ms-dot-wrap">
+        <div class="ms-node ${nc}">${past?'✓':i+1}</div>
+        ${i<MILESTONES.length-1?'<div class="ms-spine"></div>':''}
+      </div>
+      <div class="ms-content">
+        <div class="ms-title">${m.title}</div>
+        <div class="ms-meta">
+          <span class="ms-date">${m.date}</span>
+          <span class="ms-days ${dCls}">${days<0?'Past':days+'d'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderDashUp(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const up=filteredEvents().filter(e=>new Date(e.date)>=today).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
+  if(!up.length){document.getElementById('dash-up').innerHTML='<div class="empty-st">No upcoming events</div>';return;}
+  document.getElementById('dash-up').innerHTML=up.map(ev=>{
+    const c=catFor(ev.category);const days=Math.ceil((new Date(ev.date)-today)/86400000);
+    return`<div class="up-row" onclick="openModal(${JSON.stringify(ev).replace(/"/g,'&quot;')})">
+      <div class="up-bar" style="background:${c.color}"></div>
+      <div style="flex:1">
+        <div class="up-title">${ev.title}</div>
+        <div class="up-meta">${ev.owners?.map(o=>founderFor(o).name).join(' · ')||''}</div>
+      </div>
+      <div class="up-when" style="color:${days<=2?'var(--rose)':'var(--ghost)'}">${fmtDate(ev.date)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── CALENDAR ────────────────────────────────────────────
+function prevMonth(){currentMonth.setMonth(currentMonth.getMonth()-1);renderCal();}
+function nextMonth(){currentMonth.setMonth(currentMonth.getMonth()+1);renderCal();}
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('active'));
+  const idx={month:0,list:1,milestones:2}[v]??0;
+  document.querySelectorAll('.vtab')[idx]?.classList.add('active');
+  renderCal();
+}
+function renderCal(){
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('mnth-lbl').textContent=`${MONTHS[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+  if(currentView==='month')renderMonthGrid();
+  else if(currentView==='list')renderListView();
+  else renderMilestoneView();
+}
+function renderMonthGrid(){
+  const y=currentMonth.getFullYear(),mo=currentMonth.getMonth();
+  const first=new Date(y,mo,1).getDay(),dim=new Date(y,mo+1,0).getDate();
+  const today=new Date();today.setHours(0,0,0,0);
+  const evs=filteredEvents();
+  let html=`<div class="cal-wrap"><div class="day-nm-row">`;
+  ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="dnm">${d}</div>`);
+  html+=`</div><div class="cells-grid">`;
+  for(let i=0;i<first;i++)html+=`<div class="cal-cell empty-cell"></div>`;
+  for(let d=1;d<=dim;d++){
+    const ds=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=new Date(y,mo,d).getTime()===today.getTime();
+    const dayEvs=evs.filter(e=>e.date===ds);
+    html+=`<div class="cal-cell" onclick="openModal({date:'${ds}'})">
+      <div class="cellnum ${isToday?'today':''}">${d}</div>`;
+    dayEvs.slice(0,3).forEach(e=>{
+      const c=catFor(e.category);
+      html+=`<div class="ev-chip" style="background:${c.bg};color:${c.color};border-left-color:${c.color}"
+        onclick="event.stopPropagation();openModal(${JSON.stringify(e).replace(/"/g,'&quot;')})">${e.title}</div>`;
+    });
+    if(dayEvs.length>3)html+=`<div class="more-ev">+${dayEvs.length-3}</div>`;
+    html+=`</div>`;
+  }
+  html+=`</div></div>`;
+  document.getElementById('cal-content').innerHTML=html;
+}
+function renderListView(){
+  const evs=filteredEvents().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const today=new Date();today.setHours(0,0,0,0);
+  if(!evs.length){document.getElementById('cal-content').innerHTML='<div class="empty-st" style="padding:22px">No events</div>';return;}
+  let html='',lastMo='';
+  evs.forEach(ev=>{
+    const d=new Date(ev.date);
+    const mo=d.toLocaleDateString('en',{month:'long',year:'numeric'});
+    if(mo!==lastMo){html+=`<div style="font-size:8.5px;font-weight:700;color:var(--ghost);letter-spacing:.15em;text-transform:uppercase;padding:12px 2px 6px">${mo}</div>`;lastMo=mo;}
+    const c=catFor(ev.category);const past=d<today;
+    html+=`<div class="list-ev ${past?'past-ev':''}" onclick="openModal(${JSON.stringify(ev).replace(/"/g,'&quot;')})">
+      <div style="width:2.5px;height:32px;border-radius:1px;background:${c.color};flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text)">${ev.title}</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:2px">${ev.owners?.map(o=>founderFor(o).name).join(' · ')||''} · ${c.label}</div></div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:11px;font-weight:600;color:var(--text)">${d.toLocaleDateString('en',{month:'short',day:'numeric'})}</div>
+        <div style="font-size:9.5px;color:var(--muted)">${ev.time||''}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('cal-content').innerHTML=html;
+}
+function renderMilestoneView(){
+  const today=new Date();
+  let html=`<div class="ms-view-wrap"><div class="ms-spine-v"></div>`;
+  MILESTONES.forEach(m=>{
+    const d=new Date(m.date);const days=Math.ceil((d-today)/86400000);
+    if(m.id==='ms6'){
+      html+=`<div class="launch-card">
+        <div class="ms-cv-dot" style="background:var(--gold)"></div>
+        <div style="font-size:8px;color:rgba(255,255,255,.22);letter-spacing:.18em;margin-bottom:9px">LAUNCH DATE</div>
+        <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:600;color:#fff;margin-bottom:5px">${m.title}</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.32);margin-bottom:10px">${m.date}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:700;color:var(--gold);line-height:1">${Math.max(0,days)}</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.14em;margin-top:3px">DAYS REMAINING</div>
+      </div>`;
+    }else{
+      const col=days<0?'var(--ghost)':days<14?'var(--rose)':days<30?'var(--amber)':m.color;
+      html+=`<div class="ms-cv">
+        <div class="ms-cv-dot" style="background:${m.color}"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:3px">${m.title}</div>
+            <div style="font-size:10px;color:var(--muted)">${m.date}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:${col}">${days<0?'Past':days+'d'}</div>
+        </div>
+      </div>`;
+    }
+  });
+  html+=`</div>`;
+  document.getElementById('cal-content').innerHTML=html;
+}
+
+// ─── CALENDAR SIDEBAR ────────────────────────────────────
+function setCSTab(id){
+  activeCSTab=id;
+  document.querySelectorAll('.cstab').forEach(b=>b.classList.remove('active'));
+  const idx={reminders:0,suggest:1,upcoming:2,team:3}[id]??0;
+  document.querySelectorAll('.cstab')[idx]?.classList.add('active');
+  renderCSPanel();
+}
+function renderCSPanel(){
+  if(activeCSTab==='reminders')renderReminders();
+  else if(activeCSTab==='suggest')renderSuggest();
+  else if(activeCSTab==='upcoming')renderUpcomingPanel();
+  else renderTeamPanel();
+}
+function renderReminders(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const items=[];
+  events.filter(e=>new Date(e.date)<today&&e.priority==='critical').forEach(e=>{
+    items.push({type:'overdue',title:e.title,why:'Critical task overdue — needs immediate attention',action:'Reschedule or mark complete',ev:e});
+  });
+  events.filter(e=>{const d=new Date(e.date);return d>=today&&(d-today)/86400000<=7&&e.priority!=='low';}).slice(0,4).forEach(e=>{
+    const days=Math.ceil((new Date(e.date)-today)/86400000);
+    items.push({type:'urgent',title:e.title,why:`Due ${days===0?'today':days===1?'tomorrow':'in '+days+' days'}`,action:e.owners?.map(o=>founderFor(o).name).join(' + ')+' to action',ev:e});
+  });
+  MILESTONES.filter(m=>{const d=new Date(m.date);return d>today&&(d-today)/86400000<21;}).forEach(m=>{
+    const days=Math.ceil((new Date(m.date)-today)/86400000);
+    items.push({type:'normal',title:m.title,why:`Milestone in ${days} days — are you on track?`,action:'Review progress',ev:null});
+  });
+  if(!items.length){document.getElementById('cspanel').innerHTML='<div class="empty-st">All clear ✓</div>';return;}
+  document.getElementById('cspanel').innerHTML=items.slice(0,8).map(r=>`
+    <div class="remind-item ${r.type}">
+      <div class="ri-title">${r.title}</div>
+      <div class="ri-why">${r.why}</div>
+      <div class="ri-action">${r.action}</div>
+      <div class="ri-btns">
+        ${r.ev?`<button class="ri-btn pri" onclick="openModal(${JSON.stringify(r.ev).replace(/"/g,'&quot;')})">View</button>`:''}
+        <button class="ri-btn sec">Dismiss</button>
+      </div>
+    </div>`).join('');
+}
+function renderSuggest(){
+  const modes=[{id:'week',label:'This Week',sub:'Priority actions'},{id:'milestones',label:'Milestones',sub:'Gap analysis'},{id:'guy',label:'For Guy',sub:'Creative tasks'},{id:'pom',label:'For Pom',sub:'Production'}];
+  document.getElementById('cspanel').innerHTML=`
+    <div class="smode-grid">${modes.map(m=>`<button class="smode ${suggestMode===m.id?'active':''}" onclick="setSuggestMode('${m.id}')">${m.label}<br><span style="font-weight:400;opacity:.7">${m.sub}</span></button>`).join('')}</div>
+    <textarea class="gen-ctx" id="gen-ctx" rows="2" placeholder="Optional context…">${getAutoCtx()}</textarea>
+    <button class="gen-btn" id="gen-btn" onclick="generateSuggestions()" ${suggestLoading?'disabled':''}>
+      ${suggestLoading?'Generating…':'✦ Generate Focus'}</button>
+    <div id="gen-out"></div>`;
+}
+function setSuggestMode(m){suggestMode=m;renderSuggest();}
+function getAutoCtx(){
+  const today=new Date();
+  const up=events.filter(e=>new Date(e.date)>=today&&(new Date(e.date)-today)/86400000<=14).slice(0,5);
+  const days=Math.ceil((LAUNCH_DATE-today)/86400000);
+  return`${days} days to launch. Upcoming: ${up.map(e=>e.title).join(', ')}.`;
+}
+async function generateSuggestions(){
+  if(suggestLoading)return;
+  suggestLoading=true;
+  document.getElementById('gen-btn').disabled=true;document.getElementById('gen-btn').textContent='Generating…';
+  document.getElementById('gen-out').innerHTML='<div class="empty-st">Thinking…</div>';
+  const ctx=document.getElementById('gen-ctx').value;
+  const today=new Date();const days=Math.ceil((LAUNCH_DATE-today)/86400000);
+  const prompts={
+    week:`Strategic advisor for PROPHECY Bangkok luxury womenswear, ${days} days to July 1 launch. Context: ${ctx}\nGive 4 short specific actionable reminders for THIS WEEK. JSON array: [{title,reason,owner,urgency}] urgency: "critical"|"high"|"medium". JSON only.`,
+    milestones:`PROPHECY luxury startup, ${days} days to launch. Milestones: ${MILESTONES.map(m=>m.title+' '+m.date).join(', ')}. Context: ${ctx}\nIdentify 4 milestone risks and actions. JSON: [{milestone,risk,action,owner}]. JSON only.`,
+    guy:`Creative Director Guy at PROPHECY, ${days} days to launch. Context: ${ctx}\n4 creative tasks Guy must action this week. JSON: [{task,reason,deadline}]. JSON only.`,
+    pom:`Production Lead Pom at PROPHECY, ${days} days to launch. Context: ${ctx}\n4 production tasks Pom must action. JSON: [{task,reason,deadline}]. JSON only.`,
+  };
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompts[suggestMode]}]})});
+    const d=await r.json();
+    const items=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+    let html='';
+    items.forEach(item=>{
+      const keys=Object.keys(item);
+      const title=item.title||item.task||item.milestone||item[keys[0]];
+      const body=item.reason||item.risk||item.action||'';
+      const extra=item.owner||item.deadline||item.urgency||'';
+      const urgent=item.urgency==='critical'||item.urgency==='high';
+      html+=`<div class="remind-item ${urgent?'urgent':''}">
+        <div class="ri-title">${title}</div>
+        <div class="ri-why">${body}</div>
+        ${extra?`<div class="ri-action">${extra}</div>`:''}
+        <div class="ri-btns"><button class="ri-btn pri" onclick="openModal({title:${JSON.stringify(title)},date:'${new Date().toISOString().split('T')[0]}',category:'strategy',owners:['sharp','guy','pom'],priority:'${item.urgency||'high'}',notes:'',time:''})">+ Calendar</button></div>
+      </div>`;
+    });
+    document.getElementById('gen-out').innerHTML=html;
+  }catch(e){document.getElementById('gen-out').innerHTML='<div class="empty-st" style="color:var(--rose)">Error — try again</div>';}
+  suggestLoading=false;
+  const b2=document.getElementById('gen-btn');if(b2){b2.disabled=false;b2.textContent='✦ Generate Focus';}
+}
+function renderUpcomingPanel(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const up=filteredEvents().filter(e=>new Date(e.date)>=today).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,18);
+  if(!up.length){document.getElementById('cspanel').innerHTML='<div class="empty-st">No upcoming events</div>';return;}
+  document.getElementById('cspanel').innerHTML=up.map(ev=>{
+    const c=catFor(ev.category);const days=Math.ceil((new Date(ev.date)-today)/86400000);
+    return`<div class="upitem" onclick="openModal(${JSON.stringify(ev).replace(/"/g,'&quot;')})">
+      <div class="ui-bar" style="background:${c.color}"></div>
+      <div style="flex:1"><div class="ui-title">${ev.title}</div><div class="ui-meta">${ev.owners?.map(o=>founderFor(o).name).join(' · ')||''}</div></div>
+      <div class="updays" style="color:${days<=3?'var(--rose)':'var(--ghost)'}">${fmtDate(ev.date)}</div>
+    </div>`;
+  }).join('');
+}
+function renderTeamPanel(){
+  const today=new Date();
+  const up=events.filter(e=>new Date(e.date)>=today&&(new Date(e.date)-today)/86400000<=21).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('cspanel').innerHTML=FOUNDERS.map(f=>{
+    const fevs=up.filter(e=>e.owners?.includes(f.id));
+    return`<div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+        <div style="width:21px;height:21px;border-radius:50%;background:${f.color};color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">${f.name[0]}</div>
+        <span style="font-size:11.5px;font-weight:700;color:var(--text)">${f.name}</span>
+        <span style="font-size:9.5px;color:var(--ghost);margin-left:auto">${fevs.length} upcoming</span>
+      </div>
+      ${fevs.slice(0,3).map(e=>`<div style="font-size:10.5px;color:var(--text);padding:4px 8px;background:var(--paper);border-radius:4px;margin-bottom:3px;cursor:pointer;border-left:2px solid ${catFor(e.category).color}" onclick="openModal(${JSON.stringify(e).replace(/"/g,'&quot;')})">${e.title}</div>`).join('')}
+      ${fevs.length===0?'<div style="font-size:10.5px;color:var(--ghost);padding:2px 8px">Clear</div>':''}
+    </div>`;
+  }).join('');
+}
+
+// ─── INSIGHT ─────────────────────────────────────────────
+async function loadInsight(force=false){
+  const key='prophecy_insight_'+new Date().toDateString();
+  if(!force){const c=localStorage.getItem(key);if(c){document.getElementById('insight-txt').textContent=c;return;}}
+  document.getElementById('insight-txt').textContent='Generating briefing…';
+  const today=new Date();const days=Math.ceil((LAUNCH_DATE-today)/86400000);
+  const thisWeek=events.filter(e=>{const d=new Date(e.date);return d>=today&&(d-today)/86400000<=7;}).map(e=>e.title).join(', ');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:`Strategic voice for PROPHECY Bangkok luxury womenswear. ${days} days to July 1 launch. This week: ${thisWeek||'no events'}. Cash: −4,682 THB. Write ONE powerful specific strategic focus sentence (20-30 words). Urgent, actionable, luxury-brand tone. No clichés.`}]})});
+    const d=await r.json();const txt=d.content[0].text.trim();
+    document.getElementById('insight-txt').textContent=txt;
+    localStorage.setItem(key,txt);
+  }catch(e){document.getElementById('insight-txt').textContent='Focus on what only you can do today — every day before launch counts.';}
+}
+
+// ─── EXCEL ────────────────────────────────────────────────
+function handleExcelUpload(input){
+  const file=input.files[0];if(!file)return;
+  toast('Excel connected — finance sync coming in next update');
+  document.getElementById('excel-data').innerHTML=`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:9px 12px;color:#16a34a;font-size:11.5px;font-weight:600">📊 ${file.name} connected</div>`;
+}
+
+// ─── MODAL ────────────────────────────────────────────────
+function buildModalOptions(){
+  document.getElementById('m-cat-opts').innerHTML=CATEGORIES.map(c=>`<button class="copt" id="mcat-${c.id}" onclick="setMCat('${c.id}')" style="border-color:${c.color}44;color:${c.color}">${c.label}</button>`).join('');
+  document.getElementById('m-own-opts').innerHTML=FOUNDERS.map(f=>`<button class="oopt" id="mown-${f.id}" onclick="toggleMOwner('${f.id}')"><span class="pdot" style="background:${f.color}"></span>${f.name}</button>`).join('');
+  document.getElementById('m-pri-opts').innerHTML=['low','medium','high','critical'].map(p=>`<button class="popt" id="mpri-${p}" onclick="setMPri('${p}')">${p}</button>`).join('');
+  updateModalSel();
+}
+function setMCat(id){mCat=id;updateModalSel();}
+function toggleMOwner(id){if(mOwners.includes(id)){if(mOwners.length>1)mOwners=mOwners.filter(x=>x!==id);}else mOwners.push(id);updateModalSel();}
+function setMPri(id){mPri=id;updateModalSel();}
+function updateModalSel(){
+  CATEGORIES.forEach(c=>{const el=document.getElementById(`mcat-${c.id}`);if(!el)return;el.style.background=mCat===c.id?c.bg:'#fafafa';el.style.borderColor=mCat===c.id?c.color:c.color+'44';el.style.fontWeight=mCat===c.id?'700':'600';});
+  FOUNDERS.forEach(f=>{const el=document.getElementById(`mown-${f.id}`);if(!el)return;el.style.background=mOwners.includes(f.id)?f.bg:'#fafafa';el.style.borderColor=mOwners.includes(f.id)?f.color:'var(--line)';});
+  ['low','medium','high','critical'].forEach(p=>{const el=document.getElementById(`mpri-${p}`);if(!el)return;const cols={low:'#3A7A5C',medium:'#B8965A',high:'#B04060',critical:'#0D0B10'};el.style.background=mPri===p?cols[p]:'#fafafa';el.style.color=mPri===p?'#fff':'var(--muted)';el.style.borderColor=mPri===p?cols[p]:'var(--line)';});
+}
+function setDefaultDate(){const t=new Date();document.getElementById('m-date').value=t.toISOString().split('T')[0];}
+function openModal(ev){
+  editingId=ev?.id||null;
+  document.getElementById('m-title-lbl').textContent=ev?.id?'Edit Event':'New Event';
+  document.getElementById('m-title').value=ev?.title||'';
+  document.getElementById('m-date').value=ev?.date||new Date().toISOString().split('T')[0];
+  document.getElementById('m-time').value=ev?.time||'';
+  document.getElementById('m-notes').value=ev?.notes||'';
+  mCat=ev?.category||'collection';
+  mOwners=ev?.owners?[...ev.owners]:['sharp','guy','pom'];
+  mPri=ev?.priority||'medium';
+  updateModalSel();
+  document.getElementById('m-del-btn').style.display=ev?.id?'block':'none';
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('m-title').focus(),80);
+}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+async function saveEvent(){
+  const title=document.getElementById('m-title').value.trim();if(!title){document.getElementById('m-title').focus();return;}
+  const ev={id:editingId||'ev_'+Date.now(),title,date:document.getElementById('m-date').value,time:document.getElementById('m-time').value,category:mCat,owners:[...mOwners],priority:mPri,notes:document.getElementById('m-notes').value,recurring:''};
+  if(editingId)events=events.map(e=>e.id===editingId?ev:e);else events.push(ev);
+  saveLocal();closeModal();renderAll();
+  toast(editingId?'Event updated':'Event added');
+  await pushEvent(ev);
+}
+async function deleteEvent(){
+  if(!editingId)return;
+  events=events.filter(e=>e.id!==editingId);
+  saveLocal();closeModal();renderAll();
+  toast('Event deleted');
+  await pushDelete(editingId);
+}
+document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+// ─── TOAST ────────────────────────────────────────────────
+function toast(msg,dur=2400){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+setDefaultDate();
+
+// ─── COLLECTION TRACKER ──────────────────────────────────────────────
+const STYLES_KEY = 'prophecy_styles_v2';
+const COL_STAGES = ['Concept','Toile','1st Fitting','Sampling','2nd Fitting','Production','QC','Done'];
+// To edit default styles: modify COL_SEED below
+// Each style: {id, ms, name, factory, fabric, colorway, owners[], stage(0-7), due, size, qty, cost, blocker, notes, status}
+const COL_SEED = [
+  {
+    id:'s1', ms:'PRPH-001',
+    name:'Strap Long Sleeve Mini Dress',
+    factory:'MFG', fabric:'65% Viscose 35% Nylon',
+    colorway:'CW1: QZ143 Red + QZ009 Purple · CW2: QZ001 Black + Off-White',
+    owners:['guy','pom'], stage:3, due:'17 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'Knit factory may change — find new factory ASAP',
+    notes:'All knits sent to MFG 17/03. Fabric & materials received by factory. Knit construction & tension must match red dress reference sample. Stitch logo in 3 positions through eyelet hole.',
+    status:'sampling'
+  },
+  {
+    id:'s2', ms:'PRPH-002',
+    name:'Knitted Top (new style)',
+    factory:'MFG', fabric:'Knit — TBC',
+    colorway:'TBC',
+    owners:['guy','pom'], stage:1, due:'17 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'Design not confirmed — Guy must confirm urgently',
+    notes:'CRITICAL: Added late to lineup. Guy must confirm design before pieces can be sent to MFG. No tech pack yet.',
+    status:'blocked'
+  },
+  {
+    id:'s3', ms:'PRPH-003',
+    name:'Long Legs Denim Jean',
+    factory:'Jean & Jane', fabric:'Denim',
+    colorway:'Indigo · Black',
+    owners:['guy','pom'], stage:3, due:'18 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'2nd sample fabric not confirmed',
+    notes:'All denims sent to Jean & Jane 18/03. Fabrics & materials received. Must confirm fabric for 2nd sample before end of week 22–28 Mar. Leather patch development in progress.',
+    status:'sampling'
+  },
+  {
+    id:'s4', ms:'PRPH-004',
+    name:'Shirt',
+    factory:'K.Tuan', fabric:'Woven — TBC',
+    colorway:'Ivory · White',
+    owners:['guy','pom'], stage:2, due:'16 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'Tech Pack must reach K.Tuan by 16/03',
+    notes:'Tech Pack to K.Tuan by 16/03. Patterns to K.Pao 19/03 Thursday. Collect from K.Pao before 26/03.',
+    status:'sampling'
+  },
+  {
+    id:'s5', ms:'PRPH-005',
+    name:'Straight-Leg Trouser',
+    factory:'K.Pao', fabric:'Woven — TBC',
+    colorway:'Black · Ivory',
+    owners:['pom'], stage:2, due:'19 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'',
+    notes:'Patterns to K.Pao 19/03 Thursday. Collect before 26/03. Patterns need final amend.',
+    status:'sampling'
+  },
+  {
+    id:'s6', ms:'PRPH-006',
+    name:'Venus Dress',
+    factory:'K.Bank', fabric:'Jersey — DTM',
+    colorway:'Black',
+    owners:['pom'], stage:2, due:'24 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'',
+    notes:'Send to K.Bank 24/03 Tuesday. Collect before 26/03. 2nd fitting scheduled 27–30 Apr with P\u2019Lex.',
+    status:'sampling'
+  },
+  {
+    id:'s7', ms:'PRPH-007',
+    name:'Cape Long Dress',
+    factory:'K.Pao', fabric:'Crêpe — TBC',
+    colorway:'Black · Ivory',
+    owners:['guy','pom'], stage:1, due:'28 Mar',
+    size:'XS–L', qty:'', cost:'',
+    blocker:'Neckline cape design not confirmed by Guy',
+    notes:'3rd toile in progress. Design amended — waiting for Guy confirmation on cape around neckline & other details before Pom can amend pattern. Re-fit window 27–30 Apr.',
+    status:'blocked'
+  },
+];
+
+let colStyles = [];
+let currentColId = null;
+let colFilter = 'all';
+let smFactory = '', smStage = 1, smOwners = [];
+let editingStyleId = null;
+
+function loadColStyles(){
+  const s = localStorage.getItem(STYLES_KEY);
+  colStyles = s ? JSON.parse(s) : [...COL_SEED];
+}
+function saveColStyles(){
+  localStorage.setItem(STYLES_KEY, JSON.stringify(colStyles));
+  updateColBadge();
+}
+function updateColBadge(){
+  const blocked = colStyles.filter(s=>s.blocker&&s.blocker.trim()).length;
+  const b = document.getElementById('col-badge');
+  if(b) b.textContent = blocked ? blocked : '';
+  if(b && blocked) b.style.background = 'rgba(217,45,32,.15)';
+  else if(b) b.style.background = '';
+}
+
+function filterCol(btn, f){
+  colFilter = f;
+  document.querySelectorAll('.cf').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCollectionTable();
+}
+
+function renderCollection(){
+  loadColStyles();
+  renderCollectionTable();
+}
+
+function renderCollectionTable(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  let data = colFilter==='all' ? colStyles :
+             colFilter==='blocked' ? colStyles.filter(s=>s.blocker&&s.blocker.trim()) :
+             colFilter==='sampling' ? colStyles.filter(s=>s.stage===3) :
+             colFilter==='production' ? colStyles.filter(s=>s.stage===5||s.stage===6) :
+             colFilter==='done' ? colStyles.filter(s=>s.stage===7) : colStyles;
+
+  const lbl = document.getElementById('col-count-lbl');
+  if(lbl) lbl.textContent = data.length + ' of ' + colStyles.length + ' styles';
+
+  const tbody = document.getElementById('col-tbody');
+  if(!tbody) return;
+
+  const FOUNDER_COLORS = {sharp:'#0057FF', guy:'#D92D20', pom:'#079455'};
+
+  tbody.innerHTML = data.map(s=>{
+    // Stage mini dots
+    const dots = COL_STAGES.map((st,i)=>{
+      const done = i < s.stage, active = i === s.stage;
+      return `<div class="sm-dot ${done?'sm-done':active?'sm-active':'sm-todo'}">${done?'✓':''}</div>${i<COL_STAGES.length-1?`<div class="sm-line ${done||active?'sm-line-done':''}"></div>`:''}`;
+    }).join('');
+    // Owners
+    const ownerDots = (s.owners||[]).map(o=>`<span class="owner-dot" style="background:${FOUNDER_COLORS[o]||'#9E9E9E'}" title="${o}">${o[0].toUpperCase()}</span>`).join('');
+    const isSelected = s.id === currentColId;
+    return `<tr onclick="openColDetail('${s.id}')" class="${isSelected?'row-selected':''}">
+      <td class="td-ms">${s.ms}</td>
+      <td class="td-name">${s.name}</td>
+      <td class="td-factory"><span class="ftag">${s.factory||'—'}</span></td>
+      <td>${ownerDots}</td>
+      <td class="td-stage"><div class="stage-mini">${dots}</div></td>
+      <td style="font-size:11px;color:#525252;white-space:nowrap">${s.due||'—'}</td>
+      <td>${s.blocker&&s.blocker.trim()?`<span class="blocker-tag">${s.blocker}</span>`:''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openColDetail(id){
+  const s = colStyles.find(x=>x.id===id);
+  if(!s) return;
+  currentColId = id;
+
+  // Header
+  document.getElementById('cd-ms-num').textContent = s.ms;
+  document.getElementById('cd-style-name').textContent = s.name;
+
+  // Fields
+  document.getElementById('cd-factory').innerText = s.factory||'';
+  document.getElementById('cd-fabric').innerText = s.fabric||'';
+  document.getElementById('cd-cw').innerText = s.colorway||'';
+  document.getElementById('cd-due').innerText = s.due||'';
+  document.getElementById('cd-size').innerText = s.size||'';
+  document.getElementById('cd-qty').innerText = s.qty||'';
+  document.getElementById('cd-cost').innerText = s.cost||'';
+  document.getElementById('cd-blocker').value = s.blocker||'';
+  document.getElementById('cd-notes').value = s.notes||'';
+
+  // Owners
+  const FOUNDER_COLORS = {sharp:'#0057FF', guy:'#D92D20', pom:'#079455'};
+  const FOUNDER_NAMES = {sharp:'Sharp', guy:'Guy', pom:'Pom'};
+  document.getElementById('cd-owners').innerHTML = (s.owners||[]).map(o=>
+    `<span class="owner-dot" style="background:${FOUNDER_COLORS[o]||'#9E9E9E'}">${o[0].toUpperCase()}</span> ${FOUNDER_NAMES[o]||o}`
+  ).join('  ');
+
+  // Pipeline
+  renderColPipeline(s.stage);
+
+  // Show panel
+  document.getElementById('col-detail').classList.add('open');
+  document.getElementById('col-detail').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  // Refresh table highlight
+  renderCollectionTable();
+}
+
+function renderColPipeline(currentStage){
+  const pipeline = document.getElementById('cd-pipeline');
+  if(!pipeline) return;
+  pipeline.innerHTML = COL_STAGES.map((st,i)=>`
+    <div class="pipe-step ${i<currentStage?'ps-done':i===currentStage?'ps-active':'ps-todo'}" onclick="setColStage(${i})">
+      <span class="pipe-step-num">${i+1}</span>${st}
+    </div>`).join('');
+}
+
+function setColStage(stageIndex){
+  const s = colStyles.find(x=>x.id===currentColId);
+  if(!s) return;
+  s.stage = stageIndex;
+  s.status = stageIndex===7?'done':stageIndex>=5?'production':stageIndex>=3?'sampling':'active';
+  saveColStyles();
+  renderColPipeline(stageIndex);
+  renderCollectionTable();
+  toast(`Stage updated to: ${COL_STAGES[stageIndex]}`);
+}
+
+function advanceColStage(){
+  const s = colStyles.find(x=>x.id===currentColId);
+  if(!s||s.stage>=COL_STAGES.length-1) return;
+  setColStage(s.stage+1);
+}
+
+function saveColField(field, value){
+  const s = colStyles.find(x=>x.id===currentColId);
+  if(!s) return;
+  const map = {factory:'factory',fabric:'fabric',colorway:'colorway',due:'due',size:'size',qty:'qty',cost:'cost',blocker:'blocker',notes:'notes'};
+  if(map[field]) s[map[field]] = value.trim();
+  saveColStyles();
+  renderCollectionTable();
+}
+
+function closeColDetail(){
+  currentColId = null;
+  document.getElementById('col-detail').classList.remove('open');
+  renderCollectionTable();
+}
+
+function getColStyleName(){
+  const s = colStyles.find(x=>x.id===currentColId);
+  return s ? s.name : '';
+}
+
+function deleteColStyle(){
+  if(!currentColId && !editingStyleId) return;
+  const id = editingStyleId || currentColId;
+  if(!confirm('Delete this style? This cannot be undone.')) return;
+  colStyles = colStyles.filter(x=>x.id!==id);
+  saveColStyles();
+  closeColDetail();
+  closeStyleModal();
+  renderCollectionTable();
+  toast('Style deleted');
+}
+
+// Style modal (add/edit)
+function openStyleModal(id){
+  editingStyleId = id;
+  const s = id ? colStyles.find(x=>x.id===id) : null;
+  document.getElementById('sm-title').textContent = s ? 'Edit style' : 'New style';
+  document.getElementById('sm-ms').value = s?.ms||'PRPH-00'+Math.floor(Math.random()*9+8);
+  document.getElementById('sm-name').value = s?.name||'';
+  document.getElementById('sm-fabric').value = s?.fabric||'';
+  document.getElementById('sm-cw').value = s?.colorway||'';
+  document.getElementById('sm-due').value = s?.due||'';
+  document.getElementById('sm-notes').value = s?.notes||'';
+  smFactory = s?.factory||'';
+  smStage = s?.stage||1;
+  smOwners = s?.owners ? [...s.owners] : [];
+  document.getElementById('sm-del-btn').style.display = s ? 'block' : 'none';
+  // Update option buttons
+  document.querySelectorAll('#sm-factory-opts .sm-opt').forEach(b=>{
+    b.classList.toggle('selected', b.textContent.trim()===smFactory);
+  });
+  document.querySelectorAll('#sm-owner-opts .sm-opt').forEach(b=>{
+    const v=b.textContent.trim().toLowerCase();
+    b.classList.toggle('selected', smOwners.includes(v));
+  });
+  document.querySelectorAll('#sm-stage-opts .sm-opt').forEach(b=>{
+    const v=parseInt(b.textContent.trim()[0]);
+    b.classList.toggle('selected', v===smStage);
+  });
+  document.getElementById('style-modal-bg').classList.add('open');
+}
+
+function closeStyleModal(){
+  document.getElementById('style-modal-bg').classList.remove('open');
+  editingStyleId=null;
+}
+
+function toggleSmOpt(btn, type){
+  if(type==='factory'){
+    document.querySelectorAll('#sm-factory-opts .sm-opt').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    smFactory = btn.textContent.trim();
+  } else if(type==='owner'){
+    btn.classList.toggle('selected');
+    const v = btn.textContent.trim().toLowerCase();
+    smOwners = smOwners.includes(v) ? smOwners.filter(x=>x!==v) : [...smOwners, v];
+  } else if(type==='stage'){
+    document.querySelectorAll('#sm-stage-opts .sm-opt').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    smStage = parseInt(btn.textContent.trim()[0]);
+  }
+}
+
+function saveStyleModal(){
+  const name = document.getElementById('sm-name').value.trim();
+  if(!name){ document.getElementById('sm-name').focus(); return; }
+  if(editingStyleId){
+    const s = colStyles.find(x=>x.id===editingStyleId);
+    if(s){
+      s.ms=document.getElementById('sm-ms').value.trim();
+      s.name=name; s.factory=smFactory; s.fabric=document.getElementById('sm-fabric').value.trim();
+      s.colorway=document.getElementById('sm-cw').value.trim(); s.owners=smOwners;
+      s.stage=smStage; s.due=document.getElementById('sm-due').value.trim();
+      s.notes=document.getElementById('sm-notes').value.trim();
+    }
+  } else {
+    colStyles.push({
+      id:'s_'+Date.now(), ms:document.getElementById('sm-ms').value.trim(),
+      name, factory:smFactory, fabric:document.getElementById('sm-fabric').value.trim(),
+      colorway:document.getElementById('sm-cw').value.trim(), owners:smOwners,
+      stage:smStage, due:document.getElementById('sm-due').value.trim(),
+      size:'', qty:'', cost:'', blocker:'', notes:document.getElementById('sm-notes').value.trim(),
+      status:'active'
+    });
+  }
+  saveColStyles(); closeStyleModal(); renderCollectionTable();
+  if(editingStyleId) openColDetail(editingStyleId);
+  toast(editingStyleId ? 'Style updated' : 'Style added');
+}
+
+function toggleHowto(){
+  const body = document.getElementById('howto-body');
+  const lbl = document.getElementById('howto-toggle-lbl');
+  body.classList.toggle('open');
+  lbl.textContent = body.classList.contains('open') ? 'Hide ↑' : 'Show ↓';
+}
+
+document.getElementById('style-modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStyleModal();});
+
+</script>
+</body>
+</html>
