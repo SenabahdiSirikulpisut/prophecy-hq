@@ -627,6 +627,54 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);di
 .gl-swatch{width:10px;height:10px;border-radius:2px}
 .gl-today{width:2px;height:12px;background:var(--rose);opacity:.6}
 .gl-milestone{width:8px;height:8px;transform:rotate(45deg);background:var(--gold)}
+
+/* ─── BOM TAB SYSTEM ─────────────────────────────────────────────── */
+.cd-tabs{display:flex;gap:0;border-bottom:1px solid #E4E4E4;margin-bottom:16px}
+.cd-tab{padding:8px 16px;font-size:12px;font-weight:500;color:#9E9E9E;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'Inter',sans-serif;transition:all .1s}
+.cd-tab.active{color:#0F0F0F;border-bottom-color:#0F0F0F}
+.cd-tab-pane{display:none}.cd-tab-pane.active{display:block}
+
+/* BOM sections */
+.bom-section{border:1px solid #E4E4E4;border-radius:6px;overflow:hidden;margin-bottom:12px}
+.bom-sec-head{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:#F9F9F9;border-bottom:1px solid #E4E4E4}
+.bom-sec-title{font-size:11px;font-weight:600;color:#0F0F0F;letter-spacing:.02em}
+.bom-sec-actions{display:flex;gap:6px}
+.bom-icon-btn{background:none;border:none;cursor:pointer;font-size:13px;color:#9E9E9E;padding:2px 4px;border-radius:3px;transition:all .1s;font-family:'Inter',sans-serif}
+.bom-icon-btn:hover{background:#F0F0F0;color:#0F0F0F}
+.bom-table{width:100%;border-collapse:collapse;font-size:12px}
+.bom-table th{padding:6px 10px;text-align:left;font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid #E4E4E4;background:#FAFAFA;white-space:nowrap}
+.bom-table td{padding:7px 10px;border-bottom:1px solid #F4F4F4;color:#0F0F0F;vertical-align:middle}
+.bom-table tr:last-child td{border-bottom:none}
+.bom-table tr:hover td{background:#FAFAFA}
+.bom-cell-input{width:100%;border:none;background:transparent;font-size:12px;color:#0F0F0F;font-family:'Inter',sans-serif;outline:none;padding:0}
+.bom-cell-input:focus{background:#F4F7FF;border-radius:3px;padding:2px 4px}
+.bom-cell-input::placeholder{color:#CFCFCF}
+.bom-add-row{display:block;width:100%;padding:7px 13px;text-align:left;font-size:11px;color:#9E9E9E;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s;border-top:1px solid #F4F4F4}
+.bom-add-row:hover{background:#F9F9F9;color:#0F0F0F}
+.bom-del-row{background:none;border:none;cursor:pointer;color:#CFCFCF;font-size:13px;padding:2px 5px;border-radius:3px;transition:all .1s;line-height:1}
+.bom-del-row:hover{color:#D92D20;background:#FEF3F2}
+
+/* BOM image grid */
+.bom-img-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px}
+.bom-img-slot{position:relative;aspect-ratio:1;border:1.5px dashed #E4E4E4;border-radius:6px;overflow:hidden;cursor:pointer;background:#FAFAFA;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.bom-img-slot:hover{border-color:#9E9E9E;background:#F4F4F4}
+.bom-img-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.bom-img-slot .bom-img-placeholder{font-size:11px;color:#CFCFCF;text-align:center;line-height:1.5;user-select:none}
+.bom-img-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:3px;font-size:10px;cursor:pointer;padding:2px 5px;display:none;z-index:2}
+.bom-img-slot:hover .bom-img-del{display:block}
+.bom-img-input{display:none}
+
+/* BOM notes */
+.bom-notes{width:100%;border:none;padding:10px 13px;font-size:12px;color:#0F0F0F;font-family:'Inter',sans-serif;resize:vertical;min-height:80px;background:transparent;outline:none;line-height:1.6}
+.bom-notes::placeholder{color:#CFCFCF}
+.bom-notes:focus{background:#FAFCFF}
+
+/* Add section button */
+.bom-add-sec{display:flex;align-items:center;gap:6px;width:100%;padding:9px 13px;border:1.5px dashed #E4E4E4;border-radius:6px;background:transparent;cursor:pointer;font-size:11px;color:#9E9E9E;font-family:'Inter',sans-serif;transition:all .1s;margin-bottom:8px}
+.bom-add-sec:hover{border-color:#9E9E9E;color:#525252}
+.bom-save-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;margin-top:4px}
+.bom-saved-lbl{font-size:11px;color:#079455;display:none}
+.bom-saved-lbl.show{display:block}
 </style>
 </head>
 <body>
@@ -915,62 +963,82 @@ Examples:
           </div>
         </div>
         <div class="cd-body">
-          <!-- Meta fields — all inline editable -->
-          <div class="cd-grid">
-            <div class="cd-field">
-              <div class="cd-field-label">Factory <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-factory" contenteditable="true" onblur="saveColField('factory',this.innerText)"></div>
+          <!-- TAB BAR -->
+          <div class="cd-tabs">
+            <button class="cd-tab active" onclick="switchColTab(this,'overview')">Overview</button>
+            <button class="cd-tab" onclick="switchColTab(this,'bom')">Bill of Materials</button>
+          </div>
+
+          <!-- ── TAB: OVERVIEW ─────────────────────────────────────────── -->
+          <div class="cd-tab-pane active" id="cd-pane-overview">
+            <!-- Meta fields -->
+            <div class="cd-grid">
+              <div class="cd-field">
+                <div class="cd-field-label">Factory <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-factory" contenteditable="true" onblur="saveColField('factory',this.innerText)"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Fabric / Yarn <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-fabric" contenteditable="true" onblur="saveColField('fabric',this.innerText)"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Colorway(s) <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-cw" contenteditable="true" onblur="saveColField('colorway',this.innerText)"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Owner(s)</div>
+                <div class="cd-field-val" id="cd-owners"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Due / Next date <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-due" contenteditable="true" onblur="saveColField('due',this.innerText)"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Size range <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-size" contenteditable="true" onblur="saveColField('size',this.innerText)"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Quantity (units) <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-qty" contenteditable="true" onblur="saveColField('qty',this.innerText)"></div>
+              </div>
+              <div class="cd-field">
+                <div class="cd-field-label">Est. unit cost (฿) <span class="edit-hint">click to edit</span></div>
+                <div class="cd-field-val editable" id="cd-cost" contenteditable="true" onblur="saveColField('cost',this.innerText)"></div>
+              </div>
             </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Fabric / Yarn <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-fabric" contenteditable="true" onblur="saveColField('fabric',this.innerText)"></div>
+
+            <!-- Stage pipeline -->
+            <div class="cd-stages-label">Production stage <span style="font-size:10px;color:#9E9E9E;font-style:italic;letter-spacing:0;text-transform:none;margin-left:6px">Click a stage to update</span></div>
+            <div class="cd-pipeline" id="cd-pipeline"></div>
+
+            <!-- Blocker -->
+            <div style="margin-bottom:12px">
+              <div class="cd-notes-label">Blocker <span style="font-size:9px;color:#D92D20;letter-spacing:0;text-transform:none">— leave blank if none</span></div>
+              <input type="text" class="sm-input" id="cd-blocker" placeholder="e.g. Design not confirmed, waiting on Guy" onblur="saveColField('blocker',this.value)" style="margin-bottom:0">
             </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Colorway(s) <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-cw" contenteditable="true" onblur="saveColField('colorway',this.innerText)"></div>
-            </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Owner(s)</div>
-              <div class="cd-field-val" id="cd-owners"></div>
-            </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Due / Next date <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-due" contenteditable="true" onblur="saveColField('due',this.innerText)"></div>
-            </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Size range <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-size" contenteditable="true" onblur="saveColField('size',this.innerText)"></div>
-            </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Quantity (units) <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-qty" contenteditable="true" onblur="saveColField('qty',this.innerText)"></div>
-            </div>
-            <div class="cd-field">
-              <div class="cd-field-label">Est. unit cost (฿) <span class="edit-hint">click to edit</span></div>
-              <div class="cd-field-val editable" id="cd-cost" contenteditable="true" onblur="saveColField('cost',this.innerText)"></div>
+
+            <!-- Notes -->
+            <div class="cd-notes-label">Notes <span style="font-size:9px;color:#9E9E9E;letter-spacing:0;text-transform:none">— fitting feedback, amendments, factory comms</span></div>
+            <textarea class="cd-notes" id="cd-notes" placeholder="Sample feedback, fitting comments, factory notes…" onblur="saveColField('notes',this.value)"></textarea>
+
+            <div class="cd-action-row">
+              <button class="cd-btn primary" onclick="advanceColStage()">Advance stage →</button>
+              <button class="cd-btn" onclick="sendPrompt('What needs to happen next for ' + getColStyleName() + '?')">What's next? ↗</button>
+              <button class="cd-btn" onclick="sendPrompt('Are there risks to the schedule for ' + getColStyleName() + '?')">Check risks ↗</button>
+              <button class="cd-btn danger" onclick="deleteColStyle()">Delete style</button>
             </div>
           </div>
 
-          <!-- Stage pipeline — click a step to advance -->
-          <div class="cd-stages-label">Production stage <span style="font-size:10px;color:#9E9E9E;font-style:italic;letter-spacing:0;text-transform:none;margin-left:6px">Click a stage to update</span></div>
-          <div class="cd-pipeline" id="cd-pipeline"></div>
-
-          <!-- Blocker -->
-          <div style="margin-bottom:12px">
-            <div class="cd-notes-label">Blocker <span style="font-size:9px;color:#D92D20;letter-spacing:0;text-transform:none">— leave blank if none</span></div>
-            <input type="text" class="sm-input" id="cd-blocker" placeholder="e.g. Design not confirmed, waiting on Guy" onblur="saveColField('blocker',this.value)" style="margin-bottom:0">
+          <!-- ── TAB: BILL OF MATERIALS ─────────────────────────────────── -->
+          <div class="cd-tab-pane" id="cd-pane-bom">
+            <div id="bom-sections-wrap"></div>
+            <button class="bom-add-sec" onclick="bomAddSection()">+ Add section</button>
+            <div class="bom-save-bar">
+              <span class="bom-saved-lbl" id="bom-saved-lbl">✓ Saved</span>
+              <button class="cd-btn primary" onclick="saveBOM()">Save BOM</button>
+            </div>
           </div>
 
-          <!-- Notes -->
-          <div class="cd-notes-label">Notes <span style="font-size:9px;color:#9E9E9E;letter-spacing:0;text-transform:none">— fitting feedback, amendments, factory comms</span></div>
-          <textarea class="cd-notes" id="cd-notes" placeholder="Sample feedback, fitting comments, factory notes…" onblur="saveColField('notes',this.value)"></textarea>
-
-          <div class="cd-action-row">
-            <button class="cd-btn primary" onclick="advanceColStage()">Advance stage →</button>
-            <button class="cd-btn" onclick="sendPrompt('What needs to happen next for ' + getColStyleName() + '?')">What's next? ↗</button>
-            <button class="cd-btn" onclick="sendPrompt('Are there risks to the schedule for ' + getColStyleName() + '?')">Check risks ↗</button>
-            <button class="cd-btn danger" onclick="deleteColStyle()">Delete style</button>
-          </div>
         </div>
       </div>
 
@@ -3202,6 +3270,265 @@ function toggleHowto(){
 }
 
 document.getElementById('style-modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStyleModal();});
+
+
+// ─── BOM SYSTEM ───────────────────────────────────────────────────────────
+// BOM is stored per style: colStyles[i].bom = { sections: [...] }
+// Each section: { id, title, type ('table'|'images'|'notes'), cols?, rows?, images?, text? }
+
+const BOM_KEY_PREFIX = 'prph_bom_';
+
+// Default BOM template for a new style
+function defaultBOM() {
+  return { sections: [
+    {
+      id: 'bom_fab', title: 'Fabric', type: 'table',
+      cols: ['Supplier', 'Card No.', 'Composition', 'Width (cm)', 'Cost/m (฿)', 'MOQ (m)', 'Notes'],
+      rows: [['','','','','','','']]
+    },
+    {
+      id: 'bom_trim', title: 'Trimmings', type: 'table',
+      cols: ['Item', 'Type', 'Supplier', 'Colour / Spec', 'MOQ', 'Unit Cost (฿)', 'Notes'],
+      rows: [
+        ['Main Label','','SIHAI','','','',''],
+        ['Size Label','','SIHAI','','','',''],
+        ['Care Label','','CAOYI','','','',''],
+        ['Hangtag','','SIHAI','','','',''],
+        ['Thread','','','DTM','','',''],
+        ['Button','','','','','',''],
+        ['Zipper','','','','','','']
+      ]
+    },
+    {
+      id: 'bom_qty', title: 'Quantity per Colorway', type: 'table',
+      cols: ['Colorway', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'Total'],
+      rows: [['CW1 — ','','','','','','','=SUM']]
+    },
+    {
+      id: 'bom_imgs', title: 'Reference Images', type: 'images',
+      images: ['','','','','','','','']
+    },
+    {
+      id: 'bom_notes', title: 'Additional Notes', type: 'notes',
+      text: ''
+    }
+  ]};
+}
+
+function getBOM(styleId) {
+  const raw = localStorage.getItem(BOM_KEY_PREFIX + styleId);
+  return raw ? JSON.parse(raw) : defaultBOM();
+}
+
+function setBOM(styleId, bom) {
+  localStorage.setItem(BOM_KEY_PREFIX + styleId, JSON.stringify(bom));
+}
+
+let currentBOM = null;
+
+function renderBOM(styleId) {
+  currentBOM = getBOM(styleId);
+  const wrap = document.getElementById('bom-sections-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = currentBOM.sections.map((sec, si) => renderBOMSection(sec, si)).join('');
+  // wire image inputs
+  wrap.querySelectorAll('.bom-img-input').forEach(inp => {
+    inp.addEventListener('change', function() {
+      const si = +this.dataset.si, ii = +this.dataset.ii;
+      const file = this.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        currentBOM.sections[si].images[ii] = e.target.result;
+        renderBOM(currentColId);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+}
+
+function renderBOMSection(sec, si) {
+  const typeLabel = {table:'Table', images:'Images', notes:'Notes'}[sec.type] || '';
+  let body = '';
+
+  if (sec.type === 'table') {
+    const colCount = sec.cols.length;
+    body = `<table class="bom-table">
+      <thead><tr>
+        ${sec.cols.map((c,ci) => `<th style="min-width:80px">
+          <span contenteditable="true" class="bom-cell-input" style="font-size:10px;font-weight:600;color:#9E9E9E;display:block"
+            onblur="bomEditColHeader(${si},${ci},this.innerText)">${c}</span>
+        </th>`).join('')}
+        <th style="width:30px"></th>
+      </tr></thead>
+      <tbody>
+        ${sec.rows.map((row, ri) => `<tr>
+          ${row.map((cell, ci) => `<td><input class="bom-cell-input" value="${cell.replace(/"/g,'&quot;')}"
+            onblur="bomEditCell(${si},${ri},${ci},this.value)"
+            placeholder="—"></td>`).join('')}
+          <td><button class="bom-del-row" onclick="bomDelRow(${si},${ri})">✕</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <button class="bom-add-row" onclick="bomAddRow(${si})">+ Add row</button>`;
+  }
+
+  if (sec.type === 'images') {
+    body = `<div class="bom-img-grid">
+      ${(sec.images||[]).map((img, ii) => `
+        <div class="bom-img-slot" onclick="document.getElementById('bom-img-inp-${si}-${ii}').click()">
+          ${img ? `<img src="${img}" alt="">
+            <button class="bom-img-del" onclick="event.stopPropagation();bomDelImg(${si},${ii})">✕</button>`
+            : `<div class="bom-img-placeholder">+ Photo<br><span style="font-size:9px">click to upload</span></div>`}
+          <input type="file" accept="image/*" class="bom-img-input" id="bom-img-inp-${si}-${ii}"
+            data-si="${si}" data-ii="${ii}">
+        </div>`).join('')}
+    </div>
+    <button class="bom-add-row" onclick="bomAddImgSlot(${si})">+ Add slot</button>`;
+  }
+
+  if (sec.type === 'notes') {
+    body = `<textarea class="bom-notes" placeholder="Any notes, spec instructions, factory comments…"
+      onblur="bomEditNotes(${si},this.value)">${sec.text||''}</textarea>`;
+  }
+
+  return `<div class="bom-section" id="bom-sec-${si}">
+    <div class="bom-sec-head">
+      <span class="bom-sec-title" contenteditable="true"
+        onblur="bomRenameSection(${si},this.innerText)">${sec.title}</span>
+      <div class="bom-sec-actions">
+        <span style="font-size:10px;color:#CFCFCF;margin-right:4px">${typeLabel}</span>
+        ${si>0?`<button class="bom-icon-btn" onclick="bomMoveSection(${si},-1)" title="Move up">↑</button>`:''}
+        ${si<currentBOM.sections.length-1?`<button class="bom-icon-btn" onclick="bomMoveSection(${si},1)" title="Move down">↓</button>`:''}
+        <button class="bom-icon-btn" onclick="bomDelSection(${si})" title="Delete section" style="color:#FECDCA">✕</button>
+      </div>
+    </div>
+    ${body}
+  </div>`;
+}
+
+// ── BOM mutation helpers ─────────────────────────────────────────────────
+
+function bomEditColHeader(si, ci, val) {
+  currentBOM.sections[si].cols[ci] = val.trim();
+}
+function bomEditCell(si, ri, ci, val) {
+  currentBOM.sections[si].rows[ri][ci] = val;
+}
+function bomAddRow(si) {
+  const sec = currentBOM.sections[si];
+  sec.rows.push(new Array(sec.cols.length).fill(''));
+  renderBOM(currentColId);
+}
+function bomDelRow(si, ri) {
+  currentBOM.sections[si].rows.splice(ri, 1);
+  renderBOM(currentColId);
+}
+function bomDelImg(si, ii) {
+  currentBOM.sections[si].images[ii] = '';
+  renderBOM(currentColId);
+}
+function bomAddImgSlot(si) {
+  currentBOM.sections[si].images.push('');
+  renderBOM(currentColId);
+}
+function bomEditNotes(si, val) {
+  currentBOM.sections[si].text = val;
+}
+function bomRenameSection(si, val) {
+  currentBOM.sections[si].title = val.trim() || currentBOM.sections[si].title;
+}
+function bomMoveSection(si, dir) {
+  const secs = currentBOM.sections;
+  const ni = si + dir;
+  if (ni < 0 || ni >= secs.length) return;
+  [secs[si], secs[ni]] = [secs[ni], secs[si]];
+  renderBOM(currentColId);
+}
+function bomDelSection(si) {
+  if (!confirm('Delete this section?')) return;
+  currentBOM.sections.splice(si, 1);
+  renderBOM(currentColId);
+}
+function bomAddSection() {
+  const type = ['table','images','notes'][Math.floor(Math.random()*3)]; // replaced by modal below
+  showBOMAddModal();
+}
+
+function showBOMAddModal() {
+  const existing = document.getElementById('bom-add-modal');
+  if (existing) existing.remove();
+  const m = document.createElement('div');
+  m.id = 'bom-add-modal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:600;display:flex;align-items:center;justify-content:center';
+  m.innerHTML = `<div style="background:#fff;border-radius:8px;padding:20px;width:360px;box-shadow:0 8px 32px rgba(0,0,0,.12)">
+    <div style="font-size:14px;font-weight:600;color:#0F0F0F;margin-bottom:14px">Add BOM section</div>
+    <label style="font-size:11px;font-weight:500;color:#9E9E9E;display:block;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase">Section title</label>
+    <input id="bom-new-title" style="width:100%;padding:7px 10px;border:1px solid #E4E4E4;border-radius:4px;font-size:12px;font-family:Inter,sans-serif;margin-bottom:12px;outline:none" placeholder="e.g. Buttons, Packaging, Labels…">
+    <label style="font-size:11px;font-weight:500;color:#9E9E9E;display:block;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase">Type</label>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="bom-type-btn" data-type="table" style="flex:1;padding:10px 6px;border:1.5px solid #0F0F0F;border-radius:4px;background:#0F0F0F;color:#fff;font-size:11px;font-family:Inter,sans-serif;cursor:pointer;font-weight:500">Table</button>
+      <button class="bom-type-btn" data-type="images" style="flex:1;padding:10px 6px;border:1px solid #E4E4E4;border-radius:4px;background:#fff;color:#525252;font-size:11px;font-family:Inter,sans-serif;cursor:pointer">Images</button>
+      <button class="bom-type-btn" data-type="notes" style="flex:1;padding:10px 6px;border:1px solid #E4E4E4;border-radius:4px;background:#fff;color:#525252;font-size:11px;font-family:Inter,sans-serif;cursor:pointer">Notes</button>
+    </div>
+    <div id="bom-table-cols-wrap" style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:500;color:#9E9E9E;display:block;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase">Columns (comma-separated)</label>
+      <input id="bom-new-cols" style="width:100%;padding:7px 10px;border:1px solid #E4E4E4;border-radius:4px;font-size:12px;font-family:Inter,sans-serif;outline:none" value="Item, Supplier, Spec, Cost (฿), Notes">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="document.getElementById('bom-add-modal').remove()" style="padding:6px 14px;border-radius:4px;border:1px solid #E4E4E4;background:#fff;font-size:12px;font-family:Inter,sans-serif;cursor:pointer;color:#525252">Cancel</button>
+      <button onclick="bomConfirmAddSection()" style="padding:6px 14px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:12px;font-family:Inter,sans-serif;cursor:pointer;font-weight:500">Add section</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+
+  let selectedType = 'table';
+  m.querySelectorAll('.bom-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedType = btn.dataset.type;
+      m.querySelectorAll('.bom-type-btn').forEach(b => {
+        b.style.cssText = 'flex:1;padding:10px 6px;border:1px solid #E4E4E4;border-radius:4px;background:#fff;color:#525252;font-size:11px;font-family:Inter,sans-serif;cursor:pointer';
+      });
+      btn.style.cssText = 'flex:1;padding:10px 6px;border:1.5px solid #0F0F0F;border-radius:4px;background:#0F0F0F;color:#fff;font-size:11px;font-family:Inter,sans-serif;cursor:pointer;font-weight:500';
+      document.getElementById('bom-table-cols-wrap').style.display = selectedType === 'table' ? 'block' : 'none';
+    });
+    btn._getSelectedType = () => selectedType;
+  });
+  m._getType = () => selectedType;
+}
+
+function bomConfirmAddSection() {
+  const modal = document.getElementById('bom-add-modal');
+  const title = document.getElementById('bom-new-title').value.trim() || 'New section';
+  const type = modal._getType();
+  let sec = { id: 'bom_' + Date.now(), title, type };
+  if (type === 'table') {
+    const colsRaw = document.getElementById('bom-new-cols').value;
+    sec.cols = colsRaw.split(',').map(c => c.trim()).filter(Boolean);
+    if (!sec.cols.length) sec.cols = ['Item','Notes'];
+    sec.rows = [new Array(sec.cols.length).fill('')];
+  }
+  if (type === 'images') sec.images = ['','','',''];
+  if (type === 'notes') sec.text = '';
+  currentBOM.sections.push(sec);
+  modal.remove();
+  renderBOM(currentColId);
+}
+
+function saveBOM() {
+  if (!currentColId || !currentBOM) return;
+  setBOM(currentColId, currentBOM);
+  const lbl = document.getElementById('bom-saved-lbl');
+  if (lbl) { lbl.classList.add('show'); setTimeout(() => lbl.classList.remove('show'), 2000); }
+}
+
+// ── TAB SWITCHER ───────────────────────────────────────────────────────────
+function switchColTab(btn, tab) {
+  document.querySelectorAll('.cd-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cd-tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cd-pane-' + tab)?.classList.add('active');
+  if (tab === 'bom' && currentColId) renderBOM(currentColId);
+}
 
 </script>
 </body>
