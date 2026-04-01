@@ -675,11 +675,84 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);di
 .bom-save-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;margin-top:4px}
 .bom-saved-lbl{font-size:11px;color:#079455;display:none}
 .bom-saved-lbl.show{display:block}
+
+/* ─── LOGIN GATE ───────────────────────────────────────────────────────── */
+#login-gate{position:fixed;inset:0;background:#0F0F0F;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
+#login-box{background:#fff;border-radius:8px;padding:32px 28px;width:340px;box-shadow:0 24px 64px rgba(0,0,0,.4)}
+.login-logo{font-size:13px;font-weight:700;letter-spacing:.18em;color:#0F0F0F;margin-bottom:6px}
+.login-sub{font-size:11px;color:#9E9E9E;margin-bottom:24px}
+.login-lbl{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px}
+.login-inp{width:100%;padding:9px 12px;border:1px solid #E4E4E4;border-radius:5px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .1s;letter-spacing:.08em;margin-bottom:12px}
+.login-inp:focus{border-color:#0F0F0F}
+.login-btn{width:100%;padding:10px;border-radius:5px;border:none;background:#0F0F0F;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s;margin-top:4px}
+.login-btn:hover{background:#1A1A1A}
+.login-err{font-size:11px;color:#D92D20;margin-top:8px;display:none;text-align:center}
+.login-err.show{display:block}
+
+/* ─── DOCUMENT UPLOAD ──────────────────────────────────────────────────── */
+#docs-page{display:none}
+.docs-drop{border:2px dashed #E4E4E4;border-radius:8px;padding:32px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:16px;background:#FAFAFA}
+.docs-drop.dragover{border-color:#0057FF;background:#EFF8FF}
+.docs-drop-icon{font-size:24px;margin-bottom:8px;color:#9E9E9E}
+.docs-drop-title{font-size:13px;font-weight:500;color:#525252;margin-bottom:4px}
+.docs-drop-sub{font-size:11px;color:#9E9E9E}
+.docs-inp{display:none}
+.doc-list{display:flex;flex-direction:column;gap:6px}
+.doc-row{display:flex;align-items:center;gap:10px;padding:10px 13px;background:#fff;border:1px solid #E4E4E4;border-radius:6px}
+.doc-icon{font-size:18px;flex-shrink:0}
+.doc-name{font-size:12px;font-weight:500;color:#0F0F0F;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-meta{font-size:10px;color:#9E9E9E;flex-shrink:0}
+.doc-del{background:none;border:none;cursor:pointer;color:#CFCFCF;font-size:13px;padding:2px 5px;border-radius:3px;transition:all .1s}
+.doc-del:hover{color:#D92D20;background:#FEF3F2}
+.doc-dl{background:none;border:1px solid #E4E4E4;border-radius:4px;cursor:pointer;color:#525252;font-size:10px;padding:3px 8px;font-family:'Inter',sans-serif;transition:all .1s}
+.doc-dl:hover{background:#F4F4F4}
+
+/* ─── GANTT PRODUCT ROWS ───────────────────────────────────────────────── */
+.gantt-product-bar{height:16px;border-radius:3px;display:flex;align-items:center;padding:0 6px;overflow:hidden}
+.gpb-label{font-size:9px;font-weight:600;color:#fff;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+
+/* ─── WORK TRACKER DUE DATE ────────────────────────────────────────────── */
+.qa-row{display:flex;gap:6px;align-items:center;padding:8px 10px;border-top:1px solid #E4E4E4}
+.qa-inp{flex:1;border:none;background:transparent;font-size:12px;font-family:'Inter',sans-serif;outline:none;color:#0F0F0F}
+.qa-inp::placeholder{color:#CFCFCF}
+.qa-date{border:1px solid #E4E4E4;border-radius:4px;font-size:11px;font-family:'Inter',sans-serif;padding:3px 6px;color:#525252;background:#fff;outline:none;cursor:pointer}
+.qa-add-btn{padding:4px 10px;border-radius:4px;border:none;background:#0F0F0F;color:#fff;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+
+/* ─── GANTT NOTES PANEL ────────────────────────────────────────────────── */
+.gantt-notes-panel{padding:12px 20px 16px;border-top:1px solid #E4E4E4;background:#fff;flex-shrink:0;max-height:180px;overflow-y:auto}
+.gnp-title{font-size:10px;font-weight:600;color:#9E9E9E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.gnp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.gnp-card{border:1px solid #E4E4E4;border-radius:5px;padding:9px 10px;background:#FAFAFA}
+.gnp-ms{font-size:9px;font-family:'JetBrains Mono',monospace;color:#9E9E9E;margin-bottom:2px}
+.gnp-name{font-size:11px;font-weight:500;color:#0F0F0F;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gnp-stage{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;margin-bottom:4px;font-weight:500}
+.gnp-stage.blocked{background:#FEF3F2;color:#D92D20;border:1px solid #FECDCA}
+.gnp-stage.active{background:#F4F7FF;color:#0057FF;border:1px solid #BFDBFE}
+.gnp-stage.done{background:#ECFDF3;color:#079455;border:1px solid #A7F3D0}
+.gnp-note{font-size:10px;color:#525252;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ─── PAGE ORIENTATION SUBTITLES ──────────────────────────────────────── */
+.page-orient{padding:10px 20px 0;display:flex;align-items:center;gap:8px}
+.page-orient-label{font-size:11px;color:#9E9E9E;line-height:1.5}
+.page-orient-sep{width:1px;height:12px;background:#E4E4E4;flex-shrink:0}
 </style>
 </head>
 <body>
 
 <!-- ─── SIDEBAR ─── -->
+<!-- ── LOGIN GATE ─────────────────────────────────── -->
+<div id="login-gate">
+  <div id="login-box">
+    <div class="login-logo">PROPHECY</div>
+    <div class="login-sub">Command · Enter password to continue</div>
+    <label class="login-lbl">Password</label>
+    <input class="login-inp" type="password" id="login-pw" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="login-btn" onclick="tryLogin()">Enter</button>
+    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+  </div>
+</div>
+
 <nav id="sb">
   <div class="sb-brand">
     <div class="sb-name">PROPHECY</div>
@@ -715,6 +788,10 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);di
     <button class="snav" onclick="showPage('connect')">
       <span class="si">⟷</span> Connections
       <span class="sn-badge" id="conn-badge">0</span>
+    </button>
+    <button class="snav" onclick="showPage('docs')">
+      <span class="si">📁</span> Documents
+      <span class="sn-badge" id="docs-badge"></span>
     </button>
   </div>
   <div class="sb-bottom">
@@ -783,7 +860,10 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);di
     </div>
 
     <!-- DOMAIN TRACKS -->
-    <div class="tracks-outer">
+    <div class="page-orient" style="padding:8px 20px 0">
+  <span class="page-orient-label">Daily command centre — check what's urgent, review domain tracks, monitor timeline.</span>
+</div>
+<div class="tracks-outer">
       <div class="section-eyebrow">Domain Tracks</div>
       <div class="tracks-grid" id="tracks-grid"></div>
     </div>
@@ -935,7 +1015,10 @@ Examples:
     <div class="col-inner">
 
       <!-- TOOLBAR -->
-      <div class="col-toolbar">
+      <div class="page-orient">
+  <span class="page-orient-label">Track every garment's production stage. Click a row to open details or update the BOM.</span>
+</div>
+<div class="col-toolbar">
         <div class="col-title-row">
           <span class="col-h1">Collection · Capsule 01</span>
           <span class="col-count" id="col-count-lbl"></span>
@@ -1194,6 +1277,9 @@ Examples:
   ══════════════════════════════════════════════ -->
   <div id="pg-fin" class="page">
     <div class="fin-inner">
+<div class="page-orient">
+  <span class="page-orient-label">Cash position, expenses, and equity register. Upload Excel directly to parse transactions.</span>
+</div>
       <div class="fin-hero">
         <div class="fh-stat">
           <div class="fh-lbl">Founder Equity</div>
@@ -1504,6 +1590,29 @@ Examples:
 
     </div>
   </div><!-- /pg-connect -->
+  <!-- ══════════════════════════════════════════════
+       DOCUMENTS PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="pg-docs" class="page">
+    <div class="page-orient">
+      <span class="page-orient-label">Upload and access all project files — tech packs, fabric swatches, contracts, images.</span>
+    </div>
+    <div style="padding:16px 20px">
+      <div class="docs-drop" id="docs-drop-zone" onclick="document.getElementById('docs-file-inp').click()"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="handleDocDrop(event)">
+        <div class="docs-drop-icon">⬆</div>
+        <div class="docs-drop-title">Drop files here or click to browse</div>
+        <div class="docs-drop-sub">Excel, PDF, images, Word docs — any file type accepted</div>
+        <input type="file" id="docs-file-inp" class="docs-inp" multiple
+          onchange="handleDocFiles(this.files)">
+      </div>
+      <div class="doc-list" id="doc-list"></div>
+    </div>
+  </div>
+
+
 
 </div><!-- /main -->
 
@@ -1513,7 +1622,10 @@ Examples:
   <div id="pg-work" class="page">
     <div class="work-inner">
 
-      <div class="work-header">
+      <div class="page-orient">
+  <span class="page-orient-label">Tasks by founder. Add due dates when creating — overdue tasks appear in red.</span>
+</div>
+<div class="work-header">
         <div>
           <div class="work-title">Work Tracker</div>
           <div class="work-sub">Tasks, responsibilities, and ownership across the team. Each founder's lane — what's open, what's due, what's done.</div>
@@ -1593,6 +1705,9 @@ Examples:
        GANTT CHART PAGE
   ══════════════════════════════════════════════ -->
   <div id="pg-gantt" class="page">
+    <div class="page-orient" style="padding:8px 20px;border-bottom:1px solid #E4E4E4;background:#fff;flex-shrink:0">
+      <span class="page-orient-label">Full production timeline — function rows + per-style collection rows. Notes panel shows live status per garment.</span>
+    </div>
     <div class="gantt-toolbar">
       <span class="gantt-title">Company Timeline · Oct 2025 → Jul 2026</span>
       <button class="gz-btn active" onclick="setGanttZoom('full')" id="gz-full">Full Range</button>
@@ -1601,6 +1716,10 @@ Examples:
     </div>
     <div class="gantt-wrap" id="gantt-wrap">
       <div class="gantt-container" id="gantt-container"></div>
+    </div>
+    <div class="gantt-notes-panel" id="gantt-notes-panel">
+      <div class="gnp-title">Collection status</div>
+      <div class="gnp-grid" id="gnp-grid"></div>
     </div>
     <div class="gantt-legend">
       <span class="gl-item"><span class="gl-swatch" style="background:#B04060"></span>Production</span>
@@ -1709,6 +1828,7 @@ let pendingCaptures=[];
 
 // ─── INIT ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',async()=>{
+  if(!checkAuth()) return;
   const saved=localStorage.getItem(EVENTS_KEY);
   events=saved?JSON.parse(saved):[...SEED_EVENTS];
   syncUrl=localStorage.getItem(SYNC_URL_KEY)||'';
@@ -2083,6 +2203,7 @@ function filterFounder(id){
   document.querySelectorAll('.fp').forEach(b=>b.classList.remove('active-pill'));
   document.getElementById(`fp-${id}`)?.classList.add('active-pill');
   renderAll();
+  updateDocsBadge();
 }
 
 // ─── CAT BAR ────────────────────────────────────────────
@@ -2112,9 +2233,9 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(`pg-${id}`)?.classList.add('active');
   document.querySelectorAll('.snav').forEach(b=>b.classList.remove('active'));
-  const map={overview:0,capture:1,col:2,work:3,gantt:4,cal:5,fin:6,connect:7};
+  const map={overview:0,capture:1,col:2,work:3,gantt:4,cal:5,fin:6,connect:7,docs:8};
   document.querySelectorAll('.snav')[map[id]??0]?.classList.add('active');
-  const titles={overview:'Overview',capture:'Quick Capture',col:'Collection',work:'Work Tracker',gantt:'Gantt Chart',cal:'Calendar',fin:'Finance',connect:'Connections'};
+  const titles={overview:'Overview',capture:'Quick Capture',col:'Collection',work:'Work Tracker',gantt:'Gantt Chart',cal:'Calendar',fin:'Finance',connect:'Connections',docs:'Documents'};
   document.getElementById('tb-title').textContent=titles[id]||'';
   if(id==='overview'){renderDash();updateNextMs();}
   if(id==='cal')renderCal();
@@ -2123,6 +2244,7 @@ function showPage(id){
   if(id==='col')renderCollection();
   if(id==='work')renderWork();
   if(id==='gantt')renderGantt();
+  if(id==='docs')renderDocs_page();
 }
 function renderAll(){renderDash();renderCal();renderCSPanel();}
 
@@ -2263,7 +2385,11 @@ function renderWorkCols(){
         ${ftasks.map(t=>renderTaskCard(t,today)).join('')}
       </div>
       <div class="fc-add">
-        <input class="fc-add-input" id="quick-add-${f.id}" placeholder="Quick add task…" onkeydown="if(event.key==='Enter')quickAddTask('${f.id}')">
+        <div class="qa-row">
+          <input class="qa-inp" id="quick-add-${f.id}" placeholder="Quick add task…" onkeydown="if(event.key==='Enter')quickAddTask('${f.id}')">
+          <input class="qa-date" type="date" id="quick-add-date-${f.id}" title="Due date">
+          <button class="qa-add-btn" onclick="quickAddTask('${f.id}')">Add</button>
+        </div>
         <button class="fc-add-btn" onclick="quickAddTask('${f.id}')">+</button>
       </div>
     </div>`;
@@ -2298,9 +2424,11 @@ function toggleTaskDone(id){
 
 function quickAddTask(ownerId){
   const inp=document.getElementById(`quick-add-${ownerId}`);
+  const dateInp=document.getElementById(`quick-add-date-${ownerId}`);
   if(!inp||!inp.value.trim())return;
-  const t={id:'t_'+Date.now(),title:inp.value.trim(),owner:ownerId,category:'strategy',priority:'medium',due:'',notes:'',status:'open'};
-  tasks.push(t);saveTasks();inp.value='';
+  const due=dateInp?dateInp.value:'';
+  const t={id:'t_'+Date.now(),title:inp.value.trim(),owner:ownerId,category:'strategy',priority:'medium',due,notes:'',status:'open'};
+  tasks.push(t);saveTasks();inp.value='';if(dateInp)dateInp.value='';
   updateWorkBadge();renderWorkCols();
   toast('Task added');
 }
@@ -2531,7 +2659,45 @@ function renderGantt(){
     html+=`</div>`;
   });
 
-  // Milestone markers row
+  // ── Collection / Per-product rows ──────────────────────────────────
+  const colStylesForGantt = (() => { try { const s=localStorage.getItem('prophecy_styles_v2'); return s?JSON.parse(s):[]; } catch(e){return[];} })();
+  if(colStylesForGantt.length){
+    const stageColors = {0:'#CFCFCF',1:'#9E9E9E',2:'#0057FF',3:'#D97706',4:'#D97706',5:'#079455',6:'#079455',7:'#059669'};
+    html+=`<div class="gantt-group">
+      <div class="gantt-group-label"><span class="gg-icon">◉</span><span class="gg-name" style="color:#525252">Collection · per style</span></div>`;
+    colStylesForGantt.forEach(s=>{
+      const hasBlocker = s.blocker && s.blocker.trim();
+      const barColor = hasBlocker ? '#D92D20' : (stageColors[s.stage] || '#9E9E9E');
+      // Bar: start from today, width based on stage progress
+      const stageCount = 10;
+      const stagePct = Math.max(5, Math.round((s.stage / stageCount) * 100));
+      // For gantt: show bar from approx start to estimated end
+      const barStart = '2026-03-01'; // approx capsule start
+      const barEnd = '2026-07-01';   // launch
+      const bs = barStyle(barStart, barEnd, barColor);
+      const owners = (s.owners||[]).map(o=>{const f=founderFor(o);return`<div class="grl-owner" style="background:${f.color}">${f.name[0]}</div>`;}).join('');
+      html+=`<div class="gantt-row" title="${s.name} — ${s.factory||''}${hasBlocker?' ⚠ BLOCKED: '+s.blocker:''}">
+        <div class="gantt-row-label">
+          <div class="grl-owners">${owners}</div>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div class="grl-title" style="font-size:10px;color:#9E9E9E;font-family:'JetBrains Mono',monospace">${s.ms}</div>
+            <div class="grl-title">${s.name}</div>
+          </div>
+        </div>
+        <div class="gantt-timeline">
+          <div class="gantt-grid">${months.map(m=>`<div class="gantt-col ${m.isCur?'cur-month':''}" style="flex:${m.pct.toFixed(2)} 0 0"></div>`).join('')}</div>
+          ${bs?`<div class="gantt-bar-wrap" style="left:${bs.left};width:${bs.width}">
+            <div class="gantt-bar-inner" style="background:${bs.color};opacity:${hasBlocker?.9:.7}"></div>
+            <div class="gantt-bar-label" style="font-size:8px">${hasBlocker?'⚠ BLOCKED':COL_STAGES[s.stage]||''}</div>
+          </div>`:''}
+          <div class="gantt-today-line" style="left:${todayPct.toFixed(2)}%"></div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // ── Milestone markers row ──────────────────────────────────────────
   html+=`<div class="gantt-group">
     <div class="gantt-group-label"><span class="gg-icon">◆</span><span class="gg-name">Milestones</span></div>
     <div class="gantt-row">
@@ -2545,6 +2711,7 @@ function renderGantt(){
   </div>`;
 
   document.getElementById('gantt-container').innerHTML=html;
+  renderGanttNotes();
 }
 
 // ─── DASHBOARD ───────────────────────────────────────────
@@ -2934,7 +3101,9 @@ setDefaultDate();
 
 // ─── COLLECTION TRACKER ──────────────────────────────────────────────
 const STYLES_KEY = 'prophecy_styles_v2';
-const COL_STAGES = ['Concept','Toile','1st Fitting','Sampling','2nd Fitting','Production','QC','Done'];
+const COL_STAGES_DEFAULT = ['Concept','Toile 1','Toile 2','Toile 3','1st Fitting','Sampling','2nd Fitting','Production','QC','Done'];
+// Each style can have its own stages array. Falls back to COL_STAGES_DEFAULT.
+function getStyleStages(s){ return (s&&s.stages&&s.stages.length)?s.stages:[...COL_STAGES_DEFAULT]; }
 // To edit default styles: modify COL_SEED below
 // Each style: {id, ms, name, factory, fabric, colorway, owners[], stage(0-7), due, size, qty, cost, blocker, notes, status}
 const COL_SEED = [
@@ -3069,9 +3238,10 @@ function renderCollectionTable(){
 
   tbody.innerHTML = data.map(s=>{
     // Stage mini dots
-    const dots = COL_STAGES.map((st,i)=>{
+    const stagesForStyle = getStyleStages(s);
+    const dots = stagesForStyle.map((st,i)=>{
       const done = i < s.stage, active = i === s.stage;
-      return `<div class="sm-dot ${done?'sm-done':active?'sm-active':'sm-todo'}">${done?'✓':''}</div>${i<COL_STAGES.length-1?`<div class="sm-line ${done||active?'sm-line-done':''}"></div>`:''}`;
+      return `<div class="sm-dot ${done?'sm-done':active?'sm-active':'sm-todo'}">${done?'✓':''}</div>${i<stagesForStyle.length-1?`<div class="sm-line ${done||active?'sm-line-done':''}"></div>`:''}`;
     }).join('');
     // Owners
     const ownerDots = (s.owners||[]).map(o=>`<span class="owner-dot" style="background:${FOUNDER_COLORS[o]||'#9E9E9E'}" title="${o}">${o[0].toUpperCase()}</span>`).join('');
@@ -3129,10 +3299,13 @@ function openColDetail(id){
 function renderColPipeline(currentStage){
   const pipeline = document.getElementById('cd-pipeline');
   if(!pipeline) return;
-  pipeline.innerHTML = COL_STAGES.map((st,i)=>`
+  const s = colStyles.find(x=>x.id===currentColId);
+  const stages = getStyleStages(s);
+  pipeline.innerHTML = stages.map((st,i)=>`
     <div class="pipe-step ${i<currentStage?'ps-done':i===currentStage?'ps-active':'ps-todo'}" onclick="setColStage(${i})">
       <span class="pipe-step-num">${i+1}</span>${st}
-    </div>`).join('');
+    </div>`).join('') +
+    `<div class="pipe-step ps-todo" onclick="bomAddStage()" style="border:1.5px dashed #E4E4E4;color:#9E9E9E;flex:0 0 auto;min-width:60px" title="Add stage">+ Stage</div>`;
 }
 
 function setColStage(stageIndex){
@@ -3143,12 +3316,12 @@ function setColStage(stageIndex){
   saveColStyles();
   renderColPipeline(stageIndex);
   renderCollectionTable();
-  toast(`Stage updated to: ${COL_STAGES[stageIndex]}`);
+  const _s=colStyles.find(x=>x.id===currentColId); toast(`Stage updated to: ${getStyleStages(_s)[stageIndex]||stageIndex}`);
 }
 
 function advanceColStage(){
   const s = colStyles.find(x=>x.id===currentColId);
-  if(!s||s.stage>=COL_STAGES.length-1) return;
+  if(!s||s.stage>=getStyleStages(s).length-1) return;
   setColStage(s.stage+1);
 }
 
@@ -3528,6 +3701,194 @@ function switchColTab(btn, tab) {
   btn.classList.add('active');
   document.getElementById('cd-pane-' + tab)?.classList.add('active');
   if (tab === 'bom' && currentColId) renderBOM(currentColId);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE 1 — LOGIN GATE
+// ═══════════════════════════════════════════════════════════════════════════
+const AUTH_KEY = 'prph_auth_v1';
+const PASS_HASH_KEY = 'prph_pass_v1';
+
+// Default password hash (sha256 of 'prophecy2026') — changeable in settings
+// Using a simple obfuscated check for single-file deployment
+function simpleHash(str){
+  let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return h.toString(16);
+}
+
+function getStoredPass(){
+  return localStorage.getItem(PASS_HASH_KEY) || simpleHash('prophecy2026');
+}
+
+function tryLogin(){
+  const pw = document.getElementById('login-pw').value;
+  const err = document.getElementById('login-err');
+  if(simpleHash(pw) === getStoredPass()){
+    localStorage.setItem(AUTH_KEY,'1');
+    document.getElementById('login-gate').style.display='none';
+    err.classList.remove('show');
+    init();
+  } else {
+    err.classList.add('show');
+    document.getElementById('login-pw').value='';
+    document.getElementById('login-pw').focus();
+  }
+}
+
+function checkAuth(){
+  if(localStorage.getItem(AUTH_KEY)==='1'){
+    document.getElementById('login-gate').style.display='none';
+    return true;
+  }
+  document.getElementById('login-pw').focus();
+  return false;
+}
+
+function changePassword(newPass){
+  if(!newPass||newPass.length<4){toast('Password too short (min 4 chars)');return;}
+  localStorage.setItem(PASS_HASH_KEY, simpleHash(newPass));
+  toast('Password updated ✓');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE 2 — STAGE MANAGEMENT (add/remove stages per garment)
+// ═══════════════════════════════════════════════════════════════════════════
+function bomAddStage(){
+  const s = colStyles.find(x=>x.id===currentColId);
+  if(!s) return;
+  const name = prompt('New stage name (will be added after current stage):','Toile 4');
+  if(!name||!name.trim()) return;
+  if(!s.stages) s.stages = [...COL_STAGES_DEFAULT];
+  s.stages.splice(s.stage+1, 0, name.trim());
+  saveColStyles();
+  renderColPipeline(s.stage);
+  toast('Stage added: ' + name.trim());
+}
+
+function removeColStage(stageIndex){
+  const s = colStyles.find(x=>x.id===currentColId);
+  if(!s) return;
+  if(!s.stages) s.stages = [...COL_STAGES_DEFAULT];
+  if(s.stages.length<=2){toast('Need at least 2 stages');return;}
+  if(!confirm(`Remove stage "${s.stages[stageIndex]}"?`)) return;
+  s.stages.splice(stageIndex,1);
+  if(s.stage>=s.stages.length) s.stage=s.stages.length-1;
+  saveColStyles();
+  renderColPipeline(s.stage);
+  toast('Stage removed');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE 3 — GANTT NOTES PANEL (product status under chart)
+// ═══════════════════════════════════════════════════════════════════════════
+function renderGanttNotes(){
+  const grid = document.getElementById('gnp-grid');
+  if(!grid) return;
+  let styles=[];
+  try{ const s=localStorage.getItem('prophecy_styles_v2'); styles=s?JSON.parse(s):[];}catch(e){}
+  if(!styles.length){grid.innerHTML='<div style="font-size:11px;color:#9E9E9E;grid-column:span 4">No styles in collection yet.</div>';return;}
+  grid.innerHTML = styles.map(s=>{
+    const stages = getStyleStages(s);
+    const stageName = stages[s.stage] || 'Unknown';
+    const hasBlocker = s.blocker && s.blocker.trim();
+    const isDone = s.stage >= stages.length-1;
+    const cls = hasBlocker ? 'blocked' : isDone ? 'done' : 'active';
+    const pct = Math.round((s.stage / Math.max(stages.length-1,1))*100);
+    return `<div class="gnp-card">
+      <div class="gnp-ms">${s.ms}</div>
+      <div class="gnp-name" title="${s.name}">${s.name}</div>
+      <div class="gnp-stage ${cls}">${hasBlocker ? '⚠ ' : ''}${stageName}</div>
+      <div style="height:3px;background:#F0F0F0;border-radius:2px;margin-bottom:4px">
+        <div style="height:3px;border-radius:2px;width:${pct}%;background:${hasBlocker?'#D92D20':isDone?'#079455':'#0057FF'}"></div>
+      </div>
+      <div class="gnp-note">${hasBlocker ? '🔴 '+s.blocker : (s.notes||'No notes')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE 6 — DOCUMENT UPLOAD
+// ═══════════════════════════════════════════════════════════════════════════
+const DOCS_KEY = 'prph_docs_v1';
+
+function getDocs(){ try{const s=localStorage.getItem(DOCS_KEY);return s?JSON.parse(s):[]}catch(e){return[];}}
+function saveDocs(docs){ localStorage.setItem(DOCS_KEY,JSON.stringify(docs)); updateDocsBadge(); }
+function updateDocsBadge(){
+  const b=document.getElementById('docs-badge');
+  const docs=getDocs();
+  if(b) b.textContent=docs.length||'';
+}
+
+function handleDocDrop(e){
+  e.preventDefault();
+  document.getElementById('docs-drop-zone').classList.remove('dragover');
+  handleDocFiles(e.dataTransfer.files);
+}
+
+function handleDocFiles(files){
+  if(!files||!files.length) return;
+  const docs = getDocs();
+  let processed = 0;
+  Array.from(files).forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      const ext = file.name.split('.').pop().toLowerCase();
+      const icon = ext==='pdf'?'📄':['xlsx','xls','csv'].includes(ext)?'📊':['jpg','jpeg','png','gif','webp'].includes(ext)?'🖼':['doc','docx'].includes(ext)?'📝':'📁';
+      docs.push({
+        id:'doc_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        name:file.name, size:file.size, type:file.type, ext, icon,
+        added:new Date().toISOString(), data:ev.target.result
+      });
+      processed++;
+      if(processed===files.length){
+        saveDocs(docs);
+        renderDocs();
+        toast(`${files.length} file${files.length>1?'s':''} added`);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderDocs(){
+  const list = document.getElementById('doc-list');
+  if(!list) return;
+  const docs = getDocs();
+  updateDocsBadge();
+  if(!docs.length){
+    list.innerHTML='<div style="font-size:12px;color:#9E9E9E;text-align:center;padding:20px">No documents uploaded yet</div>';
+    return;
+  }
+  list.innerHTML = docs.map(d=>{
+    const sizeFmt = d.size>1048576?(d.size/1048576).toFixed(1)+'MB':(d.size/1024).toFixed(0)+'KB';
+    const date = new Date(d.added).toLocaleDateString('en',{month:'short',day:'numeric'});
+    return `<div class="doc-row">
+      <span class="doc-icon">${d.icon}</span>
+      <span class="doc-name" title="${d.name}">${d.name}</span>
+      <span class="doc-meta">${sizeFmt} · ${date}</span>
+      <button class="doc-dl" onclick="downloadDoc('${d.id}')">↓ Download</button>
+      <button class="doc-del" onclick="deleteDoc('${d.id}')" title="Remove">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function downloadDoc(id){
+  const docs=getDocs();
+  const d=docs.find(x=>x.id===id);
+  if(!d)return;
+  const a=document.createElement('a');
+  a.href=d.data;a.download=d.name;a.click();
+}
+
+function deleteDoc(id){
+  let docs=getDocs();
+  docs=docs.filter(x=>x.id!==id);
+  saveDocs(docs);renderDocs();
+  toast('Document removed');
+}
+
+function renderDocs_page(){
+  renderDocs();
 }
 
 </script>
