@@ -735,6 +735,38 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);di
 .page-orient{padding:10px 20px 0;display:flex;align-items:center;gap:8px}
 .page-orient-label{font-size:11px;color:#9E9E9E;line-height:1.5}
 .page-orient-sep{width:1px;height:12px;background:#E4E4E4;flex-shrink:0}
+.page-guide{
+  display:grid;
+  grid-template-columns:1.25fr 1fr 1fr;
+  gap:10px;
+  padding:10px 20px;
+  border-bottom:1px solid #E4E4E4;
+  background:#fff;
+}
+.pg-card{
+  border:1px solid #EDEDED;
+  border-radius:6px;
+  padding:8px 10px;
+  background:#FAFAFA;
+  min-width:0;
+}
+.pg-k{
+  display:block;
+  font-size:9px;
+  font-weight:600;
+  color:#9E9E9E;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-bottom:3px;
+}
+.pg-v{
+  font-size:11px;
+  line-height:1.45;
+  color:#525252;
+}
+@media (max-width:1080px){
+  .page-guide{grid-template-columns:1fr}
+}
 
 /* ─── GANTT PER-GARMENT STAGE BAR ─────────────────────────────────────── */
 .gantt-row.garment-row{height:38px;background:#FAFAFA;border-left:3px solid transparent}
@@ -834,6 +866,20 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--text);di
       </div>
     </div>
     <button id="add-btn" onclick="openModal(null)">+ Event</button>
+  </div>
+  <div class="page-guide" id="page-guide">
+    <div class="pg-card">
+      <span class="pg-k">Purpose</span>
+      <span class="pg-v" id="pg-purpose">See current business health, priorities, and launch-critical signals.</span>
+    </div>
+    <div class="pg-card">
+      <span class="pg-k">How To Use</span>
+      <span class="pg-v" id="pg-how">Read the KPI strip first, then review tracks, milestones, and events for blockers.</span>
+    </div>
+    <div class="pg-card">
+      <span class="pg-k">Main Functions</span>
+      <span class="pg-v" id="pg-actions">Refresh briefing, jump to calendar/finance, and monitor active tasks to launch.</span>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════
@@ -1568,6 +1614,19 @@ Examples:
 
       <!-- APPS SCRIPT CODE -->
       <div class="conn-group-title" style="margin-top:4px">Extend Your Apps Script</div>
+          <div class="conn-card" style="margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <span style="font-size:16px">📋</span>
+              <div class="cc-name">MasterSheets Backend Code</div>
+              <span class="cc-status setup" style="margin-left:auto">Copy & paste into Apps Script</span>
+            </div>
+            <div class="cc-desc">Paste this into your Apps Script to enable full 2-way sync with Prophecy_MasterSheets (ID: 1Icm4dJaydm0YVsjs2ncYL6KbxPJobhnv). It handles Styles, BOM, and Tasks tabs.</div>
+            <textarea id="as-snippet" style="width:100%;height:120px;font-size:10px;font-family:'JetBrains Mono',monospace;border:1px solid #E4E4E4;border-radius:4px;padding:8px;resize:vertical;background:#F9F9F9;color:#0F0F0F" readonly></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="cc-save" onclick="document.getElementById('as-snippet').select();document.execCommand('copy');toast('Code copied ✓')">Copy code</button>
+              <a href="https://script.google.com/home/projects/1xctRKnsNQs5m3sby2JrMXEbm7C25R1gG0Z1zkEMrkQg0pOErzkGF1tuQ/edit" target="_blank"><button class="cc-save" style="background:#fff;color:#0F0F0F;border:1px solid #E4E4E4">Open Apps Script →</button></a>
+            </div>
+          </div>
       <div class="conn-card" style="margin-bottom:24px">
         <div class="cc-top" style="margin-bottom:10px">
           <div class="cc-left">
@@ -1852,11 +1911,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
   integrations=JSON.parse(localStorage.getItem(INTEG_KEY)||'{}');
   captures=JSON.parse(localStorage.getItem(CAPTURES_KEY)||'[]');
 
-  const BAKED='https://script.google.com/macros/s/AKfycbwFxgEkiZ5gDttpLHX1W1UtXSgUcTp36qMAnwi-0qNtP9EKIA2uK3YRQ9vT59Z-mh3r/exec';
+  const BAKED='https://script.google.com/macros/s/AKfycbwFxgEkiZ5gDttpLHX1W1UtXSgUcTp36qMAnwi-0qNtP9EKIA2uK3YRQ9vT59Z-mh3r/exec'; // Update this with new MasterSheets Apps Script URL
   if(!syncUrl&&BAKED){syncUrl=BAKED;localStorage.setItem(SYNC_URL_KEY,syncUrl);}
 
   updateCountdown();setInterval(updateCountdown,60000);
   buildFounderPills();buildCatBar();buildModalOptions();buildTaskModalOptions();setDefaultDate();
+  updatePageGuide('overview');
   loadTasks();updateWorkBadge();
   loadColStyles();updateColBadge();
   renderAll();renderConnections();renderSavedCaptures();
@@ -1931,6 +1991,10 @@ function updateConnStatusBar(){
     if(on)count++;
   });
   document.getElementById('conn-badge').textContent=count;
+}
+function populateASSnippet(){
+  const el = document.getElementById('as-snippet');
+  if(el && typeof MASTER_SHEETS_SCRIPT !== 'undefined') el.value = MASTER_SHEETS_SCRIPT.trim();
 }
 function renderConnections(){
   ['sheets','gcal','gmail','gdrive','line','zapier'].forEach(k=>{
@@ -2221,6 +2285,7 @@ function filterFounder(id){
   document.getElementById(`fp-${id}`)?.classList.add('active-pill');
   renderAll();
   updateDocsBadge();
+  addSheetsSync();
 }
 
 // ─── CAT BAR ────────────────────────────────────────────
@@ -2246,6 +2311,64 @@ function catFor(id){return CATEGORIES.find(c=>c.id===id)||{color:'#aaa',bg:'#f5f
 function founderFor(id){return FOUNDERS.find(f=>f.id===id)||{color:'#aaa',name:id};}
 
 // ─── PAGES ──────────────────────────────────────────────
+const PAGE_GUIDE={
+  overview:{
+    purpose:'See current business health, priorities, and launch-critical signals.',
+    how:'Read KPI strip first, then scan tracks, milestones, and upcoming events for blockers.',
+    actions:'Refresh briefing, jump to calendar or finance details, and monitor active tasks.'
+  },
+  capture:{
+    purpose:'Convert raw notes into structured records for planning and execution.',
+    how:'Paste text, choose mode when needed, then review parsed cards before saving.',
+    actions:'Auto-structure notes, route to the right destination, and review capture history.'
+  },
+  col:{
+    purpose:'Track each garment from concept to production with editable style-level detail.',
+    how:'Filter styles, open a row, update stage/BOM, then save after material plan changes.',
+    actions:'Edit style data, manage blockers, and add one BOM fabric row per material-colorway option.'
+  },
+  work:{
+    purpose:'Manage founder responsibilities with clear due dates and urgency visibility.',
+    how:'Review per founder lane and resolve overdue items first.',
+    actions:'Quick-add tasks, assign ownership, and update status or due dates.'
+  },
+  gantt:{
+    purpose:'View timeline by function and by style in a single production map.',
+    how:'Use Full Range or Now to Launch to compare plan timing against live progress.',
+    actions:'Track milestone timing, inspect collection status cards, and catch slippage early.'
+  },
+  cal:{
+    purpose:'Coordinate events, milestones, reminders, and team commitments in one place.',
+    how:'Switch Month, List, and Launch views then filter by category.',
+    actions:'Create or edit events, review upcoming priorities, and monitor team workload.'
+  },
+  fin:{
+    purpose:'Keep cash, equity, and expense visibility clear for production decisions.',
+    how:'Check hero numbers first, then validate ledger lines and uploaded file output.',
+    actions:'Review spend and runway, upload Excel, and confirm founder equity status.'
+  },
+  connect:{
+    purpose:'Connect Prophecy HQ with external tools so updates sync across systems.',
+    how:'Start from Sheets and activate integrations in priority order.',
+    actions:'Manage webhook URL, verify status chips, and copy setup scripts.'
+  },
+  docs:{
+    purpose:'Store project files in one workspace for fast team access.',
+    how:'Upload by drag/drop or browse, then verify date and size in the list.',
+    actions:'Upload, download, remove files, and keep production references centralized.'
+  }
+};
+
+function updatePageGuide(id){
+  const cfg=PAGE_GUIDE[id]||PAGE_GUIDE.overview;
+  const purpose=document.getElementById('pg-purpose');
+  const how=document.getElementById('pg-how');
+  const actions=document.getElementById('pg-actions');
+  if(purpose)purpose.textContent=cfg.purpose;
+  if(how)how.textContent=cfg.how;
+  if(actions)actions.textContent=cfg.actions;
+}
+
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(`pg-${id}`)?.classList.add('active');
@@ -2254,9 +2377,10 @@ function showPage(id){
   document.querySelectorAll('.snav')[map[id]??0]?.classList.add('active');
   const titles={overview:'Overview',capture:'Quick Capture',col:'Collection',work:'Work Tracker',gantt:'Gantt Chart',cal:'Calendar',fin:'Finance',connect:'Connections',docs:'Documents'};
   document.getElementById('tb-title').textContent=titles[id]||'';
+  updatePageGuide(id);
   if(id==='overview'){renderDash();updateNextMs();}
   if(id==='cal')renderCal();
-  if(id==='connect')renderConnections();
+  if(id==='connect'){renderConnections();setTimeout(populateASSnippet,100);}
   if(id==='capture')renderSavedCaptures();
   if(id==='col')renderCollection();
   if(id==='work')renderWork();
@@ -2333,7 +2457,13 @@ function loadTasks(){
   const s=localStorage.getItem(TASKS_KEY);
   tasks=s?JSON.parse(s):[...SEED_TASKS];
 }
-function saveTasks(){localStorage.setItem(TASKS_KEY,JSON.stringify(tasks));}
+function saveTasks(){
+  localStorage.setItem(TASKS_KEY,JSON.stringify(tasks));
+  clearTimeout(window._tasksPushTimer);
+  window._tasksPushTimer = setTimeout(() => {
+    if(typeof pushTasks === 'function') pushTasks();
+  }, 1500);
+}
 function updateWorkBadge(){
   const open=tasks.filter(t=>t.status!=='done').length;
   const b=document.getElementById('work-badge');
@@ -3246,6 +3376,11 @@ function loadColStyles(){
 function saveColStyles(){
   localStorage.setItem(STYLES_KEY, JSON.stringify(colStyles));
   updateColBadge();
+  // Auto-push to MasterSheets (debounced)
+  clearTimeout(window._stylesPushTimer);
+  window._stylesPushTimer = setTimeout(() => {
+    if(typeof pushStyles === 'function') pushStyles();
+  }, 1500);
 }
 function updateColBadge(){
   const blocked = colStyles.filter(s=>s.blocker&&s.blocker.trim()).length;
@@ -3502,21 +3637,26 @@ const BOM_KEY_PREFIX = 'prph_bom_';
 function defaultBOM() {
   return { sections: [
     {
-      id: 'bom_fab', title: 'Fabric', type: 'table',
-      cols: ['Supplier', 'Card No.', 'Composition', 'Width (cm)', 'Cost/m (฿)', 'MOQ (m)', 'Notes'],
-      rows: [['','','','','','','']]
+      id: 'bom_fab', title: 'Fabric Variants', type: 'table',
+      cols: ['SKU ID','Category','Colorway','Material','Card No.','Composition','Supplier','Cost/M (฿)','Price List (1m)','Availability','Restock','Masterstyle Impact','Notes'],
+      rows: [
+        ['','','Main CW','','','','','','','','','Same masterstyle',''],
+        ['','','','','','','','','','','','','']
+      ]
     },
     {
       id: 'bom_trim', title: 'Trimmings', type: 'table',
-      cols: ['Item', 'Type', 'Supplier', 'Colour / Spec', 'MOQ', 'Unit Cost (฿)', 'Notes'],
+      cols: ['Item','Type','Colour','Material','Card No.','Specs','Supplier','Unit Cost (฿)','MOQ','Notes'],
       rows: [
-        ['Main Label','','SIHAI','','','',''],
-        ['Size Label','','SIHAI','','','',''],
-        ['Care Label','','CAOYI','','','',''],
-        ['Hangtag','','SIHAI','','','',''],
-        ['Thread','','','DTM','','',''],
-        ['Button','','','','','',''],
-        ['Zipper','','','','','','']
+        ['Main Label','Label','','Cotton','','','SIHAI','','',''],
+        ['Size Label','Label','','','','','SIHAI','','',''],
+        ['Care Label','Label','','','','','CAOYI','','',''],
+        ['Hangtag (White)','Hangtag','','','','','SIHAI','','',''],
+        ['Hangtag (Black)','Hangtag','','','','','SIHAI','','',''],
+        ['Thread','Thread','DTM','','','','','','',''],
+        ['Button','Button','','','','','','','',''],
+        ['Zipper','Zipper','','','','','','','',''],
+        ['Hanger Tape','Trim','DTM','Satin 0.3cm','','','','','','']
       ]
     },
     {
@@ -3537,7 +3677,22 @@ function defaultBOM() {
 
 function getBOM(styleId) {
   const raw = localStorage.getItem(BOM_KEY_PREFIX + styleId);
-  return raw ? JSON.parse(raw) : defaultBOM();
+  const bom = raw ? JSON.parse(raw) : defaultBOM();
+  const fab = (bom.sections || []).find(s => s.id === 'bom_fab');
+  if (fab && fab.type === 'table') {
+    if (fab.title === 'Fabric') fab.title = 'Fabric Variants';
+    if (!fab.cols || fab.cols.length < 13) {
+      fab.cols = ['SKU ID','Category','Colorway','Material','Card No.','Composition','Supplier','Cost/M (฿)','Price List (1m)','Availability','Restock','Masterstyle Impact','Notes'];
+      fab.rows = (fab.rows || []).map(r => {
+        const row = Array.isArray(r) ? [...r] : [];
+        while (row.length < 13) row.push('');
+        if (!row[11]) row[11] = 'Same masterstyle';
+        return row.slice(0,13);
+      });
+      if (!fab.rows.length) fab.rows = [['','','Main CW','','','','','','','','','Same masterstyle','']];
+    }
+  }
+  return bom;
 }
 
 function setBOM(styleId, bom) {
@@ -3572,6 +3727,13 @@ function renderBOMSection(sec, si) {
 
   if (sec.type === 'table') {
     const colCount = sec.cols.length;
+    const isFabricSec = sec.id === 'bom_fab';
+    const addLabel = isFabricSec ? '+ Add fabric variant row' : '+ Add row';
+    const helper = isFabricSec
+      ? `<div style="padding:8px 10px;border-top:1px solid #F4F4F4;background:#FCFCFC;font-size:10px;color:#9E9E9E;line-height:1.5">
+          Add one row per material and colorway combination. If cost difference is material enough, mark <strong style="color:#525252">Masterstyle Impact</strong> as <strong style="color:#525252">New masterstyle</strong>.
+        </div>`
+      : '';
     body = `<table class="bom-table">
       <thead><tr>
         ${sec.cols.map((c,ci) => `<th style="min-width:80px">
@@ -3589,7 +3751,8 @@ function renderBOMSection(sec, si) {
         </tr>`).join('')}
       </tbody>
     </table>
-    <button class="bom-add-row" onclick="bomAddRow(${si})">+ Add row</button>`;
+    ${helper}
+    <button class="bom-add-row" onclick="bomAddRow(${si})">${addLabel}</button>`;
   }
 
   if (sec.type === 'images') {
@@ -3937,6 +4100,310 @@ function deleteDoc(id){
 function renderDocs_page(){
   renderDocs();
 }
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MASTERSHEET BACKEND SYNC
+// Sheet ID: 1Icm4dJaydm0YVsjs2ncYL6KbxPJobhnv
+// Sheets is source of truth — localStorage is cache only
+// All writes go to Sheets. Reads pull from Sheets on page load.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const MASTER_SHEET_ID = '1Icm4dJaydm0YVsjs2ncYL6KbxPJobhnv';
+const SHEETS_SYNC_KEY = 'prph_sheets_sync_v1';
+const SYNC_STATUS_KEY = 'prph_last_sync';
+
+// Tabs we write to in MasterSheets
+const SHEET_TABS = {
+  styles:  'Styles',
+  bom:     'BOM',
+  tasks:   'Tasks',
+  events:  'Events',
+  finance: 'Finance',
+  docs:    'Docs'
+};
+
+// ── Core send function ────────────────────────────────────────────────────
+async function sheetsPost(payload) {
+  if (!syncUrl) { console.warn('[Sheets] No sync URL set'); return false; }
+  try {
+    await fetch(syncUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, sheetId: MASTER_SHEET_ID })
+    });
+    localStorage.setItem(SYNC_STATUS_KEY, new Date().toISOString());
+    updateSyncBadge('live');
+    return true;
+  } catch(e) {
+    console.error('[Sheets] POST failed:', e);
+    updateSyncBadge('offline');
+    return false;
+  }
+}
+
+async function sheetsGet(tab) {
+  if (!syncUrl) return null;
+  try {
+    const r = await fetch(`${syncUrl}?action=readTab&tab=${tab}&sheetId=${MASTER_SHEET_ID}&t=${Date.now()}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch(e) {
+    console.error('[Sheets] GET failed:', e);
+    return null;
+  }
+}
+
+// ── Sync badge ────────────────────────────────────────────────────────────
+function updateSyncBadge(state) {
+  const sb = document.querySelector('.sb-sync-row');
+  if (!sb) return;
+  sb.className = 'sb-sync-row ' + (state === 'live' ? 'live' : state === 'syncing' ? 'syncing' : 'offline');
+  const last = localStorage.getItem(SYNC_STATUS_KEY);
+  const lbl = sb.querySelector('.sb-sync-lbl');
+  if (lbl) lbl.textContent = state === 'live'
+    ? (last ? 'Synced ' + new Date(last).toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}) : 'Live')
+    : state === 'syncing' ? 'Syncing…' : 'Offline';
+}
+
+// ── STYLES sync ───────────────────────────────────────────────────────────
+async function pushStyles() {
+  const styles = colStyles.map(s => [
+    s.id, s.ms, s.name, s.factory, s.fabric, s.colorway,
+    (s.owners||[]).join(','), s.stage, (s.stages||[]).join('|'),
+    s.due, s.size, s.qty, s.cost, s.blocker, s.notes, s.status
+  ]);
+  return sheetsPost({
+    action: 'writeTab',
+    tab: SHEET_TABS.styles,
+    headers: ['id','ms','name','factory','fabric','colorway','owners','stage','customStages','due','size','qty','cost','blocker','notes','status'],
+    rows: styles
+  });
+}
+
+async function pullStyles() {
+  const data = await sheetsGet(SHEET_TABS.styles);
+  if (!data || !data.rows || !data.rows.length) return false;
+  const headers = data.headers || [];
+  const idx = k => headers.indexOf(k);
+  const parsed = data.rows.map(r => ({
+    id:        r[idx('id')] || 's_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    ms:        r[idx('ms')] || '',
+    name:      r[idx('name')] || '',
+    factory:   r[idx('factory')] || '',
+    fabric:    r[idx('fabric')] || '',
+    colorway:  r[idx('colorway')] || '',
+    owners:   (r[idx('owners')] || '').split(',').filter(Boolean),
+    stage:     parseInt(r[idx('stage')]) || 0,
+    stages:   (r[idx('customStages')] || '').split('|').filter(Boolean),
+    due:       r[idx('due')] || '',
+    size:      r[idx('size')] || '',
+    qty:       r[idx('qty')] || '',
+    cost:      r[idx('cost')] || '',
+    blocker:   r[idx('blocker')] || '',
+    notes:     r[idx('notes')] || '',
+    status:    r[idx('status')] || 'active'
+  })).filter(s => s.name);
+  if (parsed.length) {
+    colStyles = parsed;
+    localStorage.setItem(STYLES_KEY, JSON.stringify(colStyles));
+    return true;
+  }
+  return false;
+}
+
+// ── BOM sync ──────────────────────────────────────────────────────────────
+async function pushBOM(styleId, bom) {
+  // Flatten BOM into rows: each section → multiple rows tagged with styleId + sectionId
+  const rows = [];
+  (bom.sections || []).forEach(sec => {
+    if (sec.type === 'table') {
+      (sec.rows || []).forEach(row => {
+        rows.push([styleId, sec.id, sec.title, 'table', JSON.stringify(row)]);
+      });
+    } else if (sec.type === 'notes') {
+      rows.push([styleId, sec.id, sec.title, 'notes', sec.text || '']);
+    } else if (sec.type === 'images') {
+      // Store image count only — base64 too large for Sheets
+      rows.push([styleId, sec.id, sec.title, 'images', (sec.images||[]).filter(x=>x).length + ' images uploaded']);
+    }
+  });
+  // Also store full BOM JSON in a Notes backup col for safe roundtrip
+  rows.push([styleId, '_full_json', 'BOM JSON', 'json', JSON.stringify(bom)]);
+  return sheetsPost({
+    action: 'writeTabByKey',
+    tab: SHEET_TABS.bom,
+    keyCol: 0, // styleId column
+    keyVal: styleId,
+    headers: ['styleId','sectionId','sectionTitle','type','data'],
+    rows
+  });
+}
+
+async function pullBOM(styleId) {
+  const data = await sheetsGet(`${SHEET_TABS.bom}?styleId=${styleId}`);
+  if (!data || !data.rows) return null;
+  // Look for the _full_json row first (fastest roundtrip)
+  const jsonRow = data.rows.find(r => r[1] === '_full_json');
+  if (jsonRow && jsonRow[4]) {
+    try { return JSON.parse(jsonRow[4]); } catch(e) {}
+  }
+  return null;
+}
+
+// ── TASKS sync ────────────────────────────────────────────────────────────
+async function pushTasks() {
+  const rows = tasks.map(t => [
+    t.id, t.title, t.owner, t.category, t.priority, t.due, t.notes, t.status
+  ]);
+  return sheetsPost({
+    action: 'writeTab',
+    tab: SHEET_TABS.tasks,
+    headers: ['id','title','owner','category','priority','due','notes','status'],
+    rows
+  });
+}
+
+async function pullTasks() {
+  const data = await sheetsGet(SHEET_TABS.tasks);
+  if (!data || !data.rows || !data.rows.length) return false;
+  const headers = data.headers || [];
+  const idx = k => headers.indexOf(k);
+  const parsed = data.rows.map(r => ({
+    id:       r[idx('id')] || 't_'+Date.now(),
+    title:    r[idx('title')] || '',
+    owner:    r[idx('owner')] || 'sharp',
+    category: r[idx('category')] || 'strategy',
+    priority: r[idx('priority')] || 'medium',
+    due:      r[idx('due')] || '',
+    notes:    r[idx('notes')] || '',
+    status:   r[idx('status')] || 'open'
+  })).filter(t => t.title);
+  if (parsed.length) {
+    tasks = parsed;
+    localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+    return true;
+  }
+  return false;
+}
+
+// ── FULL PULL on load ─────────────────────────────────────────────────────
+async function pullAllFromSheets() {
+  if (!syncUrl) return;
+  updateSyncBadge('syncing');
+  const [s, t] = await Promise.all([pullStyles(), pullTasks()]);
+  updateSyncBadge('live');
+  if (s) renderCollection();
+  if (t) renderWork();
+  toast('Synced from MasterSheets ✓');
+}
+
+// ── Override saveBOM to also push ─────────────────────────────────────────
+const _originalSaveBOM = typeof saveBOM === 'function' ? saveBOM : null;
+function saveBOM() {
+  if (!currentColId || !currentBOM) return;
+  setBOM(currentColId, currentBOM);
+  pushBOM(currentColId, currentBOM); // async, fire-and-forget
+  const lbl = document.getElementById('bom-saved-lbl');
+  if (lbl) { lbl.classList.add('show'); setTimeout(() => lbl.classList.remove('show'), 2000); }
+}
+
+// ── Override saveColStyles to also push ───────────────────────────────────
+const _origSaveColStyles = saveColStyles;
+// We can't re-assign const functions, so we patch the call sites via sheetsPost directly
+// Instead we'll add a dedicated sync button on the Collection toolbar
+
+// ── Add Manual Sync button to UI ──────────────────────────────────────────
+function addSheetsSync() {
+  // Add "↑ Sync to Sheets" button to collection toolbar
+  const toolbar = document.querySelector('.col-toolbar');
+  if (toolbar && !document.getElementById('sheets-sync-btn')) {
+    const btn = document.createElement('button');
+    btn.id = 'sheets-sync-btn';
+    btn.className = 'col-add-btn';
+    btn.style.cssText = 'background:#079455;margin-left:4px';
+    btn.textContent = '↑ Sheets';
+    btn.title = 'Push all styles to MasterSheets';
+    btn.onclick = async () => {
+      btn.textContent = '…';
+      await pushStyles();
+      btn.textContent = '↑ Sheets';
+      toast('Styles pushed to MasterSheets ✓');
+    };
+    toolbar.appendChild(btn);
+  }
+  // Add sync button to work tracker header
+  const wh = document.querySelector('.work-header');
+  if (wh && !document.getElementById('tasks-sync-btn')) {
+    const btn = document.createElement('button');
+    btn.id = 'tasks-sync-btn';
+    btn.className = 'wh-btn';
+    btn.style.cssText = 'background:#079455;color:#fff;border-color:#079455;margin-left:4px';
+    btn.textContent = '↑ Sheets';
+    btn.title = 'Push all tasks to MasterSheets';
+    btn.onclick = async () => {
+      btn.textContent = '…';
+      await pushTasks();
+      btn.textContent = '↑ Sheets';
+      toast('Tasks pushed to MasterSheets ✓');
+    };
+    wh.appendChild(btn);
+  }
+  // Add pull button to sidebar
+  const sb = document.querySelector('#sb');
+  if (sb && !document.getElementById('pull-all-btn')) {
+    const btn = document.createElement('button');
+    btn.id = 'pull-all-btn';
+    btn.className = 'sb-sync-row offline';
+    btn.style.cssText = 'margin:4px 10px;cursor:pointer;font-size:10px';
+    btn.innerHTML = '<span>↓ Pull from Sheets</span>';
+    btn.onclick = pullAllFromSheets;
+    const syncRow = sb.querySelector('.sb-sync-row');
+    if (syncRow) syncRow.after(btn);
+    else sb.appendChild(btn);
+  }
+}
+
+// Apps Script code snippet to add to MasterSheets backend
+// (display in Connections page)
+const MASTER_SHEETS_SCRIPT = `
+// Add these functions to your Apps Script for MasterSheets sync:
+function doPost(e) {
+  const data = JSON.parse(e.postData.contents);
+  const ss = SpreadsheetApp.openById('${MASTER_SHEET_ID}');
+  if (data.action === 'writeTab') {
+    const sheet = ss.getSheetByName(data.tab) || ss.insertSheet(data.tab);
+    if (data.headers && sheet.getLastRow() === 0) sheet.appendRow(data.headers);
+    data.rows.forEach(row => sheet.appendRow(row));
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  }
+  if (data.action === 'writeTabByKey') {
+    const sheet = ss.getSheetByName(data.tab) || ss.insertSheet(data.tab);
+    if (sheet.getLastRow() === 0 && data.headers) sheet.appendRow(data.headers);
+    // Remove existing rows for this key
+    const vals = sheet.getDataRange().getValues();
+    for (let i = vals.length - 1; i >= 1; i--) {
+      if (vals[i][data.keyCol] === data.keyVal) sheet.deleteRow(i + 1);
+    }
+    data.rows.forEach(row => sheet.appendRow(row));
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  }
+  // Fall through to existing event handling
+  return doPostEvents(e);
+}
+function doGet(e) {
+  const ss = SpreadsheetApp.openById('${MASTER_SHEET_ID}');
+  if (e.parameter.action === 'readTab') {
+    const sheet = ss.getSheetByName(e.parameter.tab);
+    if (!sheet) return ContentService.createTextOutput(JSON.stringify({rows:[]})).setMimeType(ContentService.MimeType.JSON);
+    const vals = sheet.getDataRange().getValues();
+    const headers = vals[0] || [];
+    const rows = vals.slice(1);
+    return ContentService.createTextOutput(JSON.stringify({headers, rows})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return doGetEvents(e);
+}`;
 
 </script>
 </body>
